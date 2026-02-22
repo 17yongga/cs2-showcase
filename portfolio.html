@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SHROUB PORTFOLIO | Collection Value Tracker</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Rajdhani:wght@300;400;500;600;700&family=Orbitron:wght@400;500;700;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --gold: #FFD700;
+            --gold-light: #FFE55C;
+            --gold-dark: #B8960C;
+            --dark-bg: #060608;
+            --dark-surface: #0f0f11;
+            --dark-card: #1a1a1e;
+            --dark-card-hover: #222226;
+            --text-primary: #ffffff;
+            --text-secondary: #cccccc;
+            --text-muted: #888888;
+            --border: #2a2a2e;
+        }
+        html { scroll-behavior: smooth; }
+        body {
+            background-color: var(--dark-bg);
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* Subtle animated background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(ellipse at 20% 50%, rgba(255,215,0,0.03) 0%, transparent 50%),
+                        radial-gradient(ellipse at 80% 20%, rgba(255,215,0,0.02) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .container { max-width: 1400px; margin: 0 auto; padding: 0 1.5rem; position: relative; z-index: 1; }
+
+        /* Header */
+        .header {
+            padding: 3rem 0 2rem;
+            text-align: center;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 2rem;
+        }
+        .header-title {
+            font-family: 'Cinzel', serif;
+            font-size: clamp(2.5rem, 8vw, 5rem);
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--gold), var(--gold-light), #fff, var(--gold-light), var(--gold-dark));
+            background-size: 300% 300%;
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: shimmer 4s ease-in-out infinite;
+            letter-spacing: 0.05em;
+            filter: drop-shadow(0 0 30px rgba(255,215,0,0.2));
+        }
+        @keyframes shimmer {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        .header-subtitle {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 1.2rem;
+            color: var(--gold-light);
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            margin-top: 0.5rem;
+        }
+        .header-updated {
+            font-family: 'Inter', sans-serif;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 1rem;
+        }
+        .header-nav {
+            margin-top: 1rem;
+        }
+        .header-nav a {
+            color: var(--gold);
+            text-decoration: none;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 0.95rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            transition: color 0.3s;
+        }
+        .header-nav a:hover { color: var(--gold-light); }
+
+        /* Progress bar */
+        .progress-container {
+            background: var(--dark-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1rem 1.5rem;
+            margin-bottom: 2rem;
+            display: none;
+        }
+        .progress-container.active { display: block; }
+        .progress-label {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+            display: flex;
+            justify-content: space-between;
+        }
+        .progress-bar-track {
+            width: 100%;
+            height: 6px;
+            background: var(--dark-bg);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--gold-dark), var(--gold), var(--gold-light));
+            border-radius: 3px;
+            transition: width 0.3s ease;
+            width: 0%;
+        }
+
+        /* Summary Cards */
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2.5rem;
+        }
+        .summary-card {
+            background: var(--dark-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .summary-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--gold), transparent);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .summary-card:hover { border-color: var(--gold-dark); transform: translateY(-2px); }
+        .summary-card:hover::before { opacity: 1; }
+        .summary-card-label {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 0.5rem;
+        }
+        .summary-card-value {
+            font-family: 'Orbitron', monospace;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--gold);
+        }
+        .summary-card-value.small { font-size: 1.1rem; }
+        .summary-card-sub {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 0.25rem;
+        }
+
+        /* Category Breakdown */
+        .section-title {
+            font-family: 'Cinzel', serif;
+            font-size: 1.6rem;
+            color: var(--gold);
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+        .category-section { margin-bottom: 2.5rem; }
+        .category-bars { display: flex; flex-direction: column; gap: 0.75rem; }
+        .category-row {
+            display: grid;
+            grid-template-columns: 120px 1fr 100px 60px;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.5rem 0;
+        }
+        .category-name {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+        .category-bar-track {
+            height: 24px;
+            background: var(--dark-card);
+            border-radius: 4px;
+            overflow: hidden;
+            position: relative;
+        }
+        .category-bar-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.8s ease;
+            display: flex;
+            align-items: center;
+            padding-left: 8px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: rgba(0,0,0,0.7);
+            min-width: fit-content;
+        }
+        .category-value {
+            font-family: 'Orbitron', monospace;
+            font-size: 0.8rem;
+            color: var(--gold);
+            text-align: right;
+        }
+        .category-pct {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            text-align: right;
+        }
+
+        /* Filter & Sort Controls */
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+            align-items: center;
+        }
+        .filter-btn {
+            background: var(--dark-card);
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            transition: all 0.2s;
+        }
+        .filter-btn:hover { border-color: var(--gold-dark); color: var(--gold); }
+        .filter-btn.active { background: var(--gold-dark); color: #000; border-color: var(--gold); font-weight: 600; }
+        .sort-select {
+            background: var(--dark-card);
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 0.85rem;
+            cursor: pointer;
+            margin-left: auto;
+        }
+        .sort-select:focus { outline: none; border-color: var(--gold-dark); }
+
+        /* Item Table */
+        .item-table-section { margin-bottom: 3rem; }
+        .item-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+        .item-table thead th {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 0.75rem 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+            cursor: pointer;
+            user-select: none;
+            transition: color 0.2s;
+            position: sticky;
+            top: 0;
+            background: var(--dark-bg);
+            z-index: 10;
+        }
+        .item-table thead th:hover { color: var(--gold); }
+        .item-table thead th.sorted { color: var(--gold); }
+        .item-table thead th .sort-arrow { margin-left: 4px; font-size: 0.7rem; }
+        .item-table tbody tr {
+            transition: background 0.2s;
+        }
+        .item-table tbody tr:hover { background: var(--dark-card-hover); }
+        .item-table tbody td {
+            padding: 0.6rem 1rem;
+            border-bottom: 1px solid rgba(42,42,46,0.5);
+            font-size: 0.9rem;
+            vertical-align: middle;
+        }
+        .item-img {
+            width: 48px;
+            height: 36px;
+            object-fit: contain;
+            border-radius: 4px;
+            background: rgba(255,255,255,0.03);
+        }
+        .item-name {
+            font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 300px;
+        }
+        .item-rarity {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+        .item-price {
+            font-family: 'Orbitron', monospace;
+            font-size: 0.85rem;
+            color: var(--gold);
+            white-space: nowrap;
+        }
+        .item-price.loading { color: var(--text-muted); font-style: italic; font-family: 'Inter', sans-serif; }
+        .item-price.na { color: var(--text-muted); font-family: 'Inter', sans-serif; }
+
+        /* Footer */
+        .footer {
+            border-top: 1px solid var(--border);
+            padding: 2rem 0 3rem;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+        .footer a {
+            color: var(--gold);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        .footer a:hover { color: var(--gold-light); }
+        .footer p { margin: 0.5rem 0; }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container { padding: 0 1rem; }
+            .summary-grid { grid-template-columns: repeat(2, 1fr); }
+            .summary-card-value { font-size: 1.3rem; }
+            .category-row {
+                grid-template-columns: 90px 1fr 80px 50px;
+                gap: 0.5rem;
+            }
+            .category-name { font-size: 0.85rem; }
+            .item-table { font-size: 0.8rem; }
+            .item-table thead th, .item-table tbody td { padding: 0.5rem 0.5rem; }
+            .item-img { width: 36px; height: 27px; }
+            .item-name { max-width: 150px; }
+            .hide-mobile { display: none; }
+            .controls { gap: 0.5rem; }
+            .filter-btn { padding: 0.4rem 0.7rem; font-size: 0.8rem; }
+        }
+        @media (max-width: 480px) {
+            .summary-grid { grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+            .summary-card { padding: 1rem; }
+            .summary-card-value { font-size: 1.1rem; }
+            .category-row {
+                grid-template-columns: 80px 1fr 70px 45px;
+            }
+        }
+
+        /* Skeleton loading animation */
+        @keyframes pulse {
+            0%, 100% { opacity: 0.4; }
+            50% { opacity: 1; }
+        }
+        .loading-pulse { animation: pulse 1.5s ease-in-out infinite; }
+
+        /* Refresh button */
+        .refresh-btn {
+            background: none;
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            padding: 0.4rem 0.8rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.2s;
+            margin-left: 0.5rem;
+        }
+        .refresh-btn:hover { border-color: var(--gold-dark); color: var(--gold); }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- Header -->
+    <header class="header">
+        <h1 class="header-title">SHROUB PORTFOLIO</h1>
+        <p class="header-subtitle">Collection Value Tracker</p>
+        <p class="header-updated" id="lastUpdated">Last updated: checking cache...</p>
+        <nav class="header-nav">
+            <a href="https://gary-yong.com/cs2">← Back to Showcase</a>
+        </nav>
+    </header>
+
+    <!-- Progress Bar -->
+    <div class="progress-container" id="progressContainer">
+        <div class="progress-label">
+            <span id="progressText">Fetching prices from Steam Market...</span>
+            <span id="progressCount">0 / 0</span>
+        </div>
+        <div class="progress-bar-track">
+            <div class="progress-bar-fill" id="progressBar"></div>
+        </div>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="summary-grid">
+        <div class="summary-card">
+            <div class="summary-card-label">Total Value</div>
+            <div class="summary-card-value" id="totalValue">---</div>
+            <div class="summary-card-sub" id="totalValueSub">loading prices...</div>
+        </div>
+        <div class="summary-card">
+            <div class="summary-card-label">Items</div>
+            <div class="summary-card-value" id="itemCount">105</div>
+            <div class="summary-card-sub">in collection</div>
+        </div>
+        <div class="summary-card">
+            <div class="summary-card-label">Most Valuable</div>
+            <div class="summary-card-value small" id="mostValuable">---</div>
+            <div class="summary-card-sub" id="mostValuableSub">category</div>
+        </div>
+        <div class="summary-card">
+            <div class="summary-card-label">24h Change</div>
+            <div class="summary-card-value small" id="dailyChange">Soon™</div>
+            <div class="summary-card-sub">coming soon</div>
+        </div>
+    </div>
+
+    <!-- Category Breakdown -->
+    <div class="category-section">
+        <h2 class="section-title">Value by Category</h2>
+        <div class="category-bars" id="categoryBars">
+            <p style="color: var(--text-muted); font-style: italic;" class="loading-pulse">Loading category data...</p>
+        </div>
+    </div>
+
+    <!-- Item Table -->
+    <div class="item-table-section">
+        <h2 class="section-title">
+            All Items
+            <button class="refresh-btn" id="refreshBtn" title="Re-fetch all prices from Steam">↻ Refresh Prices</button>
+        </h2>
+        <div class="controls" id="filterControls"></div>
+        <div style="overflow-x: auto;">
+            <table class="item-table" id="itemTable">
+                <thead>
+                    <tr>
+                        <th style="width:60px"></th>
+                        <th data-sort="name">Name <span class="sort-arrow"></span></th>
+                        <th data-sort="type" class="hide-mobile">Type <span class="sort-arrow"></span></th>
+                        <th data-sort="rarity" class="hide-mobile">Rarity <span class="sort-arrow"></span></th>
+                        <th data-sort="exterior" class="hide-mobile">Exterior <span class="sort-arrow"></span></th>
+                        <th data-sort="price" class="sorted">Price <span class="sort-arrow">▼</span></th>
+                    </tr>
+                </thead>
+                <tbody id="itemTableBody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p><a href="https://gary-yong.com/cs2">gary-yong.com/cs2</a> — The Gold Standard</p>
+        <p>Prices from <a href="https://steamcommunity.com/market/" target="_blank" rel="noopener">Steam Community Market</a> (USD)</p>
+    </footer>
+</div>
+
+<script>
+const INVENTORY = [{"name":"CZ75-Auto | Honey Paisley (Field-Tested)","icon":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIGz3UqlXOLrxM-vMGmW8VNxu5Dx60noTyLyhMG1_B1T9veReKVkM_yWF1iUxP13pN5kSi26gBBpt2uDwtyucSmRZlNzW5JwQO5YtEG5xoHuMezn7wTXg4lCm3j4jisauDErvbiYJHStEw","icon_small":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIGz3UqlXOLrxM-vMGmW8VNxu5Dx60noTyLyhMG1_B1T9veReKVkM_yWF1iUxP13pN5kSi26gBBpt2uDwtyucSmRZlNzW5JwQO5YtEG5xoHuMezn7wTXg4lCm3j4jisauDErvbiYJHStEw","rarity":"Consumer Grade","rarity_color":"b0c3d9","type":"Pistol","weapon":"CZ75-Auto","exterior":"Field-Tested","name_color":"b0c3d9"},{"name":"Sealed Genesis Terminal","icon":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJKz2lu_XsnXwtmkJjSU91dh8bj35VTqVBP4io_frnRk7P6he6FpbqWXCzSVkL4h6bExTHuwx0wk6mjUmdn_Iy2TbAUkCZslQu8CtBTrkNz5d7S1oNprwEg","icon_small":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJKz2lu_XsnXwtmkJjSU91dh8bj35VTqVBP4io_frnRk7P6he6FpbqWXCzSVkL4h6bExTHuwx0wk6mjUmdn_Iy2TbAUkCZslQu8CtBTrkNz5d7S1oNprwEg","rarity":"Base Grade","rarity_color":"b0c3d9","type":"Container","weapon":"","exterior":"","name_color":"b0c3d9"},{"name":"M4A4 | Steel Work (Field-Tested)","icon":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIGz3UqlXOLrxM-vMGmW8VNxu5Dx60noTyL8ypexwipP0P-rfKVhH_WXCWKD_uNztOh8Qmfhlklx5W7Xz4n9InrEOgIgDZIlRrFfsBa_wdWzZuy3tQXY3ohEyiqqkGoXuQDjrzkt","icon_small":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIGz3UqlXOLrxM-vMGmW8VNxu5Dx60noTyL8ypexwipP0P-rfKVhH_WXCWKD_uNztOh8Qmfhlklx5W7Xz4n9InrEOgIgDZIlRrFfsBa_wdWzZuy3tQXY3ohEyiqqkGoXuQDjrzkt","rarity":"Industrial Grade","rarity_color":"5e98d9","type":"Rifle","weapon":"M4A4","exterior":"Field-Tested","name_color":"5e98d9"},{"name":"Recoil Case","icon":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJKz2lu_XsnXwtmkJjSU91dh8bj35VTqVBP4io_frnMVu6b-avA-JqSSCjSWwuhz47U9TCzlxh9yt2WGnNqgIi-fbgUkWMNxFPlK7EdIJF6a2Q","icon_small":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJKz2lu_XsnXwtmkJjSU91dh8bj35VTqVBP4io_frnMVu6b-avA-JqSSCjSWwuhz47U9TCzlxh9yt2WGnNqgIi-fbgUkWMNxFPlK7EdIJF6a2Q","rarity":"Base Grade","rarity_color":"b0c3d9","type":"Container","weapon":"","exterior":"","name_color":"b0c3d9"},{"name":"Sticker | Lucas (Foil)","icon":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJai0ki7VeTHjMmuOHaC619h7cjn_17mUxvwnZOysiRU5v6RZLFuIePdWzLJke1w4rE9TS21wk0i4GvVyt6udXiXZwUiAsF0RO4M5xXtxtHiNPSiuVIApEH9cg","icon_small":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJai0ki7VeTHjMmuOHaC619h7cjn_17mUxvwnZOysiRU5v6RZLFuIePdWzLJke1w4rE9TS21wk0i4GvVyt6udXiXZwUiAsF0RO4M5xXtxtHiNPSiuVIApEH9cg","rarity":"Exotic","rarity_color":"d32ce6","type":"Sticker","weapon":"","exterior":"","name_color":"d32ce6"},{"name":"Premier Season Three Medal","icon":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJWk3ka5VeTr0M-gJnSZ9hll5oL541z1fg70n4Xv8x0I0PGhYapSdqXdWmXAwrp15ec9TX7ixUsjtz7czt-reHyWawB0CpIkE7QMt0PtldCzYvSiuVI6bKe_HQ","icon_small":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJWk3ka5VeTr0M-gJnSZ9hll5oL541z1fg70n4Xv8x0I0PGhYapSdqXdWmXAwrp15ec9TX7ixUsjtz7czt-reHyWawB0CpIkE7QMt0PtldCzYvSiuVI6bKe_HQ","rarity":"Extraordinary","rarity_color":"eb4b4b","type":"Collectible","weapon":"","exterior":"","name_color":"eb4b4b"},{"name":"MP7 | Short Ochre (Field-Tested)","icon":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIGz3UqlXOLrxM-vMGmW8VNxu5Dx60noTyL8jsHf7i1k4ue9fKV_JM-eC2OZ1OM447hvTn_jwEl_smuAnov8Ii_EPwR0WMchF-ML4UTsmofgYbzi4lfcg5UFk3spfTkQcg","icon_small":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIGz3UqlXOLrxM-vMGmW8VNxu5Dx60noTyL8jsHf7i1k4ue9fKV_JM-eC2OZ1OM447hvTn_jwEl_smuAnov8Ii_EPwR0WMchF-ML4UTsmofgYbzi4lfcg5UFk3spfTkQcg","rarity":"Consumer Grade","rarity_color":"b0c3d9","type":"SMG","weapon":"MP7","exterior":"Field-Tested","name_color":"b0c3d9"},{"name":"MP5-SD | Dirt Drop (Well-Worn)","icon":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIGz3UqlXOLrxM-vMGmW8VNxu5Dx60noTyL8jsPz-R1I_826abRoH-ObAXWE_vx3vO1wcCS2kRQyvnPdy9__dy-QbAF2D5IjRuADtRW-ktG0Yu7jsgfeidoQxC2riy1M63xr_a9cBiDVvxL7","icon_small":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIGz3UqlXOLrxM-vMGmW8VNxu5Dx60noTyL8jsPz-R1I_826abRoH-ObAXWE_vx3vO1wcCS2kRQyvnPdy9__dy-QbAF2D5IjRuADtRW-ktG0Yu7jsgfeidoQxC2riy1M63xr_a9cBiDVvxL7","rarity":"Consumer Grade","rarity_color":"b0c3d9","type":"SMG","weapon":"MP5-SD","exterior":"Well-Worn","name_color":"b0c3d9"},{"name":"AK-47 | Gold Arabesque (Minimal Wear)","icon":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIGz3UqlXOLrxM-vMGmW8VNxu5Dx60noTyLwlcK3wiVI0POlPPNSJ_-fCliR0-90tfJ4WiyMmRQguynLntmvICieOARzCpMhF-BYsRe-xoHvYu_g5lSNj4NDyy2viCwY6Hlu5_FCD_Q1jEqYuQ","icon_small":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIGz3UqlXOLrxM-vMGmW8VNxu5Dx60noTyLwlcK3wiVI0POlPPNSJ_-fCliR0-90tfJ4WiyMmRQguynLntmvICieOARzCpMhF-BYsRe-xoHvYu_g5lSNj4NDyy2viCwY6Hlu5_FCD_Q1jEqYuQ","rarity":"Covert","rarity_color":"eb4b4b","type":"Rifle","weapon":"AK-47","exterior":"Minimal Wear","name_color":"eb4b4b"},{"name":"StatTrak\u2122 Five-SeveN | Monkey Business (Minimal Wear)","icon":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIGz3UqlXOLrxM-vMGmW8VNxu5Dx60noTyL3l4Dl7idN6vyRa7FSJvmFC3SV1-t4j-NoQSi9lCIrujqNjsGheXmXPQcoWMFzEO5ZtUOwkILjY7yzsg3ci91DySiohn4buCht4eYET-N7rZVO80Su","icon_small":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIGz3UqlXOLrxM-vMGmW8VNxu5Dx60noTyL3l4Dl7idN6vyRa7FSJvmFC3SV1-t4j-NoQSi9lCIrujqNjsGheXmXPQcoWMFzEO5ZtUOwkILjY7yzsg3ci91DySiohn4buCht4eYET-N7rZVO80Su","rarity":"Classified","rarity_color":"d32ce6","type":"Pistol","weapon":"Five-SeveN","exterior":"Minimal Wear","name_color":"d32ce6"},{"name":"MAC-10 | Gold Brick (Factory New)","icon":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIGz3UqlXOLrxM-vMGmW8VNxu5Dx60noTyL8n5WxrR1a4s2pZ6hpH_KBB2Sb_uJ_t-l9AX2wwhl35jzRw4yodymWO1R0X5V0FrRc4Bi-m4DuY-2xsgzY39oRmSTgznQe6Q1Q_KE","icon_small":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIGz3UqlXOLrxM-vMGmW8VNxu5Dx60noTyL8n5WxrR1a4s2pZ6hpH_KBB2Sb_uJ_t-l9AX2wwhl35jzRw4yodymWO1R0X5V0FrRc4Bi-m4DuY-2xsgzY39oRmSTgznQe6Q1Q_KE","rarity":"Restricted","rarity_color":"8847ff","type":"SMG","weapon":"MAC-10","exterior":"Factory New","name_color":"8847ff"},{"name":"MP9 | Rose Iron (Factory New)","icon":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIGz3UqlXOLrxM-vMGmW8VNxu5Dx60noTyL8js_f_C9k-_qheqp0H-KcHWKvzP4vj-1gSCGn20h0423Wn9qoJH6QOwNxXpRxQOQLtEHumtTvP-i05wyMjN5Hz3qtiy1XrnE8Sl7QOgI","icon_small":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIGz3UqlXOLrxM-vMGmW8VNxu5Dx60noTyL8js_f_C9k-_qheqp0H-KcHWKvzP4vj-1gSCGn20h0423Wn9qoJH6QOwNxXpRxQOQLtEHumtTvP-i05wyMjN5Hz3qtiy1XrnE8Sl7QOgI","rarity":"Restricted","rarity_color":"8847ff","type":"SMG","weapon":"MP9","exterior":"Factory New","name_color":"8847ff"},{"name":"StatTrak\u2122 Tec-9 | Fuel Injector (Well-Worn)","icon":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIGz3UqlXOLrxM-vMGmW8VNxu5Dx60noTyLlm5W5wiVI0Oara_1SM-WDC3WTye9kt-RtcCS2kRQyvnPQnoz7JXPFb1ciXMMmE7JfsEPqkIHhNuvjtQWIg4JEmX392HhN7C46_a9cBhuml-Bv","icon_small":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIGz3UqlXOLrxM-vMGmW8VNxu5Dx60noTyLlm5W5wiVI0Oara_1SM-WDC3WTye9kt-RtcCS2kRQyvnPQnoz7JXPFb1ciXMMmE7JfsEPqkIHhNuvjtQWIg4JEmX392HhN7C46_a9cBhuml-Bv","rarity":"Classified","rarity_color":"d32ce6","type":"Pistol","weapon":"Tec-9","exterior":"Well-Worn","name_color":"d32ce6"},{"name":"Souvenir Charm | Austin 2025 Highlight | Techno4K: The Clutch God","icon":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGI6zwki4Uf_a0IWgIGjFtQQgu4z31VjyUk-hzMOu-3APtqX8a_U6c6SRW2TGlL4k5uI-TXzhxEUm6mqDzN2pcC6WZwR0A4wwG7BUDwUFHQ","icon_small":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGI6zwki4Uf_a0IWgIGjFtQQgu4z31VjyUk-hzMOu-3APtqX8a_U6c6SRW2TGlL4k5uI-TXzhxEUm6mqDzN2pcC6WZwR0A4wwG7BUDwUFHQ","rarity":"High Grade","rarity_color":"4b69ff","type":"Charm","weapon":"","exterior":"","name_color":"4b69ff"},{"name":"M4A4 | Magnesium (Minimal Wear)","icon":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIGz3UqlXOLrxM-vMGmW8VNxu5Dx60noTyL8ypexwiVI0P_6afBSI_icHneV09FxuO56Wxa_nBovp3OAzo2vdHPFPFUmCJRxRbNZ4xewx9W1Nb7j4gzXg99Ayy73iC1Aun1q_a9cBiEfMG3G","icon_small":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIGz3UqlXOLrxM-vMGmW8VNxu5Dx60noTyL8ypexwiVI0P_6afBSI_icHneV09FxuO56Wxa_nBovp3OAzo2vdHPFPFUmCJRxRbNZ4xewx9W1Nb7j4gzXg99Ayy73iC1Aun1q_a9cBiEfMG3G","rarity":"Mil-Spec Grade","rarity_color":"4b69ff","type":"Rifle","weapon":"M4A4","exterior":"Minimal Wear","name_color":"4b69ff"},{"name":"M4A1-S | Knight (Factory New)","icon":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIGz3UqlXOLrxM-vMGmW8VNxu5Dx60noTyL8ypexwjFS4_ega6F_H_GeMWqV1e96o95lRi67gVNwsWTQzdn4JHyQZ1QhWMZyQe5YsxK-ktPnZOiwtVDcjo9ExS393ytB8G81tGXpYjdX","icon_small":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIGz3UqlXOLrxM-vMGmW8VNxu5Dx60noTyL8ypexwjFS4_ega6F_H_GeMWqV1e96o95lRi67gVNwsWTQzdn4JHyQZ1QhWMZyQe5YsxK-ktPnZOiwtVDcjo9ExS393ytB8G81tGXpYjdX","rarity":"Classified","rarity_color":"d32ce6","type":"Rifle","weapon":"M4A1-S","exterior":"Factory New","name_color":"d32ce6"},{"name":"Charm | Baby Karat T","icon":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGI6zwki4Uf_a0IW2MHqH6lhKpcj_6WbwURPOip3u9CRe0PWhZKAjJPOXWDGWlOgm47QxTH7jwExy5zmAw977cinCbgcgCJNzFLID50bsw8qnab1NtMpc9Q","icon_small":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGI6zwki4Uf_a0IW2MHqH6lhKpcj_6WbwURPOip3u9CRe0PWhZKAjJPOXWDGWlOgm47QxTH7jwExy5zmAw977cinCbgcgCJNzFLID50bsw8qnab1NtMpc9Q","rarity":"Extraordinary","rarity_color":"eb4b4b","type":"Charm","weapon":"","exterior":"","name_color":"eb4b4b"},{"name":"Souvenir Glock-18 | Reactor (Field-Tested)","icon":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIGz3UqlXOLrxM-vMGmW8VNxu5Dx60noTyL2kpnj9h1a4s2gfadhJfGBMXeR1fpzou84cC6_mh4sjDCAnobsLGWRblJ1A8dyRbRYtES4xNbhNLjqtVeIi45CzSqv2i9B7S1v4u5UUPYh5OSJ2Ogs2lKT","icon_small":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIGz3UqlXOLrxM-vMGmW8VNxu5Dx60noTyL2kpnj9h1a4s2gfadhJfGBMXeR1fpzou84cC6_mh4sjDCAnobsLGWRblJ1A8dyRbRYtES4xNbhNLjqtVeIi45CzSqv2i9B7S1v4u5UUPYh5OSJ2Ogs2lKT","rarity":"Mil-Spec Grade","rarity_color":"4b69ff","type":"Pistol","weapon":"Glock-18","exterior":"Field-Tested","name_color":"4b69ff"},{"name":"Charm | Lil' Squatch","icon":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGI6zwki4Uf_a0IWsPGiE7Fhy-I764RbsQiL8l4Xz9Cxc4_ugY5tvKfeVAWiEj-10suQ6Fy2ylkolsj6BmNuvInzDZgciApAlF-JYuxK9xN2yNL-24gHAy9USv4cN0g0","icon_small":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGI6zwki4Uf_a0IWsPGiE7Fhy-I764RbsQiL8l4Xz9Cxc4_ugY5tvKfeVAWiEj-10suQ6Fy2ylkolsj6BmNuvInzDZgciApAlF-JYuxK9xN2yNL-24gHAy9USv4cN0g0","rarity":"Remarkable","rarity_color":"8847ff","type":"Charm","weapon":"","exterior":"","name_color":"8847ff"},{"name":"P250 | Sedimentary (Factory New)","icon":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIGz3UqlXOLrxM-vMGmW8VNxu5Dx60noTyLhzMOwwjFU6s23bahhL-esHXCZ0-JJvOhuRz39xk9w62XRyNr9eCrDPwV0CpsiROAIsxC-kNyxNb7q71bcjY1GzXqsiTQJsHicAIc5kQ","icon_small":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIGz3UqlXOLrxM-vMGmW8VNxu5Dx60noTyLhzMOwwjFU6s23bahhL-esHXCZ0-JJvOhuRz39xk9w62XRyNr9eCrDPwV0CpsiROAIsxC-kNyxNb7q71bcjY1GzXqsiTQJsHicAIc5kQ","rarity":"Industrial Grade","rarity_color":"5e98d9","type":"Pistol","weapon":"P250","exterior":"Factory New","name_color":"5e98d9"},{"name":"Desert Eagle | Conspiracy (Factory New)","icon":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIGz3UqlXOLrxM-vMGmW8VNxu5Dx60noTyL1m5fn8Sdk7OeRbKFsJ_yWMWaF0-tjo95lRi67gVMk4WTSm9moI3-QPVBxDJByQOJe40O6k4fnM-zgsQXci4gUyH3_3CMa8G81tJHuULJI","icon_small":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIGz3UqlXOLrxM-vMGmW8VNxu5Dx60noTyL1m5fn8Sdk7OeRbKFsJ_yWMWaF0-tjo95lRi67gVMk4WTSm9moI3-QPVBxDJByQOJe40O6k4fnM-zgsQXci4gUyH3_3CMa8G81tJHuULJI","rarity":"Classified","rarity_color":"d32ce6","type":"Pistol","weapon":"Desert Eagle","exterior":"Factory New","name_color":"d32ce6"},{"name":"Souvenir Charm | Austin 2025 Highlight | 180 One Tap","icon":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGI6zwki4Uf_a0IWgIGjFtQQgu4z31VjyUk-hzMOu-3APtqX8a_U6c6SRW2TGlL4k5uI-TXzhxEUm6mqDzN2pcC6WZwR0A4wwG7BUDwUFHQ","icon_small":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGI6zwki4Uf_a0IWgIGjFtQQgu4z31VjyUk-hzMOu-3APtqX8a_U6c6SRW2TGlL4k5uI-TXzhxEUm6mqDzN2pcC6WZwR0A4wwG7BUDwUFHQ","rarity":"High Grade","rarity_color":"4b69ff","type":"Charm","weapon":"","exterior":"","name_color":"4b69ff"},{"name":"Souvenir Charm | Austin 2025 Highlight | ZywOo Triple Kill","icon":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGI6zwki4Uf_a0IWgIGjFtQQgu4z31VjyUk-hzMOu-3APtqX8a_U6c6SRW2TGlL4k5uI-TXzhxEUm6mqDzN2pcC6WZwR0A4wwG7BUDwUFHQ","icon_small":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGI6zwki4Uf_a0IWgIGjFtQQgu4z31VjyUk-hzMOu-3APtqX8a_U6c6SRW2TGlL4k5uI-TXzhxEUm6mqDzN2pcC6WZwR0A4wwG7BUDwUFHQ","rarity":"High Grade","rarity_color":"4b69ff","type":"Charm","weapon":"","exterior":"","name_color":"4b69ff"},{"name":"Budapest 2025 Silver Coin","icon":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJG5zlm-UfvRzd6yenmC4QQlptK76EzjE02jy6nj8itV0OGnZLJoMr6WVzLCkOggsrk6Gi-yzB8l4jzQydiqJXrGaA8jXMF0QeBY5kSwxNTnKaq8sA6TtQQG","icon_small":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJG5zlm-UfvRzd6yenmC4QQlptK76EzjE02jy6nj8itV0OGnZLJoMr6WVzLCkOggsrk6Gi-yzB8l4jzQydiqJXrGaA8jXMF0QeBY5kSwxNTnKaq8sA6TtQQG","rarity":"Extraordinary","rarity_color":"eb4b4b","type":"Collectible","weapon":"","exterior":"","name_color":"eb4b4b"},{"name":"Sticker | Froggles (Holo)","icon":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJai0ki7VeTHjMmuOHaC619h7cj35VTqVBP4io_fr3IJur2mZ6hiH_aBAWCXzetl_rk6THziwkRz4z_cn9_9cHnGPw8nWZV0R-UO5hLtkde1N7zm5VTZ2YNbjXKpTOOLFVY","icon_small":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJai0ki7VeTHjMmuOHaC619h7cj35VTqVBP4io_fr3IJur2mZ6hiH_aBAWCXzetl_rk6THziwkRz4z_cn9_9cHnGPw8nWZV0R-UO5hLtkde1N7zm5VTZ2YNbjXKpTOOLFVY","rarity":"Remarkable","rarity_color":"8847ff","type":"Sticker","weapon":"","exterior":"","name_color":"8847ff"},{"name":"'Blueberries' Buckshot | NSWC SEAL","icon":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIa-2lmxU-LR0dnuNm6E8Vl45Iv181z1fh7lk6nz6XRk-fO8YaVjNPrdXWLElL5ytbBsTXrqzUxzsWmHzN-gI3-TbwQmC5pzQLELsUbrx9bmP_SiuVJe8Pfo4Q","icon_small":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIa-2lmxU-LR0dnuNm6E8Vl45Iv181z1fh7lk6nz6XRk-fO8YaVjNPrdXWLElL5ytbBsTXrqzUxzsWmHzN-gI3-TbwQmC5pzQLELsUbrx9bmP_SiuVJe8Pfo4Q","rarity":"Exceptional","rarity_color":"8847ff","type":"Agent","weapon":"","exterior":"","name_color":"8847ff"},{"name":"Number K | The Professionals","icon":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIa-2lmxU-LR0dnuNm6E8Vl45Iv181z1fgn8oYby8iRe_OGnZ6psLM-FD3WZj7wuseM-GnG2lh4h5m2EmderdX7DaA9zW8N2QuBbtBG-mty2N-i0tADAy9USaSI87As","icon_small":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIa-2lmxU-LR0dnuNm6E8Vl45Iv181z1fgn8oYby8iRe_OGnZ6psLM-FD3WZj7wuseM-GnG2lh4h5m2EmderdX7DaA9zW8N2QuBbtBG-mty2N-i0tADAy9USaSI87As","rarity":"Superior","rarity_color":"d32ce6","type":"Agent","weapon":"","exterior":"","name_color":"d32ce6"},{"name":"Revolution Case","icon":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJKz2lu_XsnXwtmkJjSU91dh8bj35VTqVBP4io_frnAVvfb6aqduc_TFVjTCxbx05OU4S3jilE9w4DzRnImtIy2Sa1JzDJEhRPlK7EcO4U8gfA","icon_small":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJKz2lu_XsnXwtmkJjSU91dh8bj35VTqVBP4io_frnAVvfb6aqduc_TFVjTCxbx05OU4S3jilE9w4DzRnImtIy2Sa1JzDJEhRPlK7EcO4U8gfA","rarity":"Base Grade","rarity_color":"b0c3d9","type":"Container","weapon":"","exterior":"","name_color":"b0c3d9"},{"name":"Austin 2025 Contenders Sticker Capsule","icon":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJG5zlm-UfvRzd6yenqC9gQlptK76UvmVRjOjYLp_ile_c2-aadmH_GGHTXAk7tJs-5nWyy9kRg1oHOBzon6ciqfaQRxXMRwRrZY4xm8wNPmN-2w7gPa3o5NzX76jykc5iht_a9cBn7eB-5Y","icon_small":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJG5zlm-UfvRzd6yenqC9gQlptK76UvmVRjOjYLp_ile_c2-aadmH_GGHTXAk7tJs-5nWyy9kRg1oHOBzon6ciqfaQRxXMRwRrZY4xm8wNPmN-2w7gPa3o5NzX76jykc5iht_a9cBn7eB-5Y","rarity":"Base Grade","rarity_color":"b0c3d9","type":"Container","weapon":"","exterior":"","name_color":"b0c3d9"},{"name":"Snakebite Case","icon":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJKz2lu_XsnXwtmkJjSU91dh8bj35VTqVBP4io_fr3oVvvT4bfI4dvTLCGTCmLl16ec7TX_mk08k42iHwtqscy-WPVUmCZJ4R_lK7Ed8Q6OYtw","icon_small":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJKz2lu_XsnXwtmkJjSU91dh8bj35VTqVBP4io_fr3oVvvT4bfI4dvTLCGTCmLl16ec7TX_mk08k42iHwtqscy-WPVUmCZJ4R_lK7Ed8Q6OYtw","rarity":"Base Grade","rarity_color":"b0c3d9","type":"Container","weapon":"","exterior":"","name_color":"b0c3d9"},{"name":"Kilowatt Case","icon":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJKz2lu_XsnXwtmkJjSU91dh8bj35VTqVBP4io_frnEVvqf_a6VoIfGSXz7Hlbwg57QwSS_mxhl15jiGyN37c3_GZw91W8BwRflK7EfKsa2sfw","icon_small":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJKz2lu_XsnXwtmkJjSU91dh8bj35VTqVBP4io_frnEVvqf_a6VoIfGSXz7Hlbwg57QwSS_mxhl15jiGyN37c3_GZw91W8BwRflK7EfKsa2sfw","rarity":"Base Grade","rarity_color":"b0c3d9","type":"Container","weapon":"","exterior":"","name_color":"b0c3d9"},{"name":"Danger Zone Case","icon":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJKz2lu_XsnXwtmkJjSU91dh8bj35VTqVBP4io_fr3MVv_H4a6FucPPBWjDIkbdz4rg4Syyyxxsi5mzRntuvJCqVbwAgDZBwRPlK7EcZJ5GkQA","icon_small":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJKz2lu_XsnXwtmkJjSU91dh8bj35VTqVBP4io_fr3MVv_H4a6FucPPBWjDIkbdz4rg4Syyyxxsi5mzRntuvJCqVbwAgDZBwRPlK7EcZJ5GkQA","rarity":"Base Grade","rarity_color":"b0c3d9","type":"Container","weapon":"","exterior":"","name_color":"b0c3d9"},{"name":"Chroma 3 Case","icon":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJKz2lu_XsnXwtmkJjSU91dh8bj35VTqVBP4io_frHAVuKf7PaJucPLHW2TExb9z4OdvHirixEomtW7cyduvci2VZ1AiCsR2Q_lK7EdW_VBhrw","icon_small":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJKz2lu_XsnXwtmkJjSU91dh8bj35VTqVBP4io_frHAVuKf7PaJucPLHW2TExb9z4OdvHirixEomtW7cyduvci2VZ1AiCsR2Q_lK7EdW_VBhrw","rarity":"Base Grade","rarity_color":"b0c3d9","type":"Container","weapon":"","exterior":"","name_color":"b0c3d9"},{"name":"Gamma 2 Case","icon":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJKz2lu_XsnXwtmkJjSU91dh8bjz61TqQCKj0JfipHMN7aX2bfM9eaPDXT7Glbx1s7Y8HHHnw0sltWXSmYmqcH-UaAU-Sswn_16VNj0","icon_small":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJKz2lu_XsnXwtmkJjSU91dh8bjz61TqQCKj0JfipHMN7aX2bfM9eaPDXT7Glbx1s7Y8HHHnw0sltWXSmYmqcH-UaAU-Sswn_16VNj0","rarity":"Base Grade","rarity_color":"b0c3d9","type":"Container","weapon":"","exterior":"","name_color":"b0c3d9"},{"name":"'Two Times' McCoy | USAF TACP","icon":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIa-2lmxU-LR0dnuNm6E8Vl45Iv181z1fh7lk6nz6XRk-fO8YaVjNP3dDDLHl7kks7U4Gi2xkUoj42XXntypcHyQO1J0DsZzFuAJsBW4kNPlN_SiuVKK_o8s4A","icon_small":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIa-2lmxU-LR0dnuNm6E8Vl45Iv181z1fh7lk6nz6XRk-fO8YaVjNP3dDDLHl7kks7U4Gi2xkUoj42XXntypcHyQO1J0DsZzFuAJsBW4kNPlN_SiuVKK_o8s4A","rarity":"Superior","rarity_color":"d32ce6","type":"Agent","weapon":"","exterior":"","name_color":"d32ce6"},{"name":"Premier Season Two Medal","icon":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJWk3ka5VeTr0M-gJnSZ9hll5oL541z1fg70n4Xv8x0J0PGhYapSdqXdXGLHxO0l6bY7Tiuwxk926mSEztj9cC6WPwN2ApNyFOJesRa-kdPmN_SiuVL3PLX0WQ","icon_small":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJWk3ka5VeTr0M-gJnSZ9hll5oL541z1fg70n4Xv8x0J0PGhYapSdqXdXGLHxO0l6bY7Tiuwxk926mSEztj9cC6WPwN2ApNyFOJesRa-kdPmN_SiuVL3PLX0WQ","rarity":"Extraordinary","rarity_color":"eb4b4b","type":"Collectible","weapon":"","exterior":"","name_color":"eb4b4b"},{"name":"Shanghai 2024 Contenders Sticker Capsule","icon":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJG5zlm-UfvRzd6yemif5AQlptO76UvmVRjOjYLp_ile_c2-aadmH-ObDzXAk7pJs-5nWyy9kRg1oHPdzoz8cHqRO1IoWMN4EecK5kW-xt20Zryz5lGL3YNGzyn7iSga7ilu_a9cBnONKJCU","icon_small":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJG5zlm-UfvRzd6yemif5AQlptO76UvmVRjOjYLp_ile_c2-aadmH-ObDzXAk7pJs-5nWyy9kRg1oHPdzoz8cHqRO1IoWMN4EecK5kW-xt20Zryz5lGL3YNGzyn7iSga7ilu_a9cBnONKJCU","rarity":"Base Grade","rarity_color":"b0c3d9","type":"Container","weapon":"","exterior":"","name_color":"b0c3d9"},{"name":"Sticker | Lynn Vision (Holo) | Copenhagen 2024","icon":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJai0ki7VeTHjMmxPSnHtwI6-J765GbvThH-0MfhrXFf6aSvbKFuIaLLX2XIxewu4OBrGC_nxxwk5zzXw9f6J36ROAI-SswnBHedd8Q","icon_small":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJai0ki7VeTHjMmxPSnHtwI6-J765GbvThH-0MfhrXFf6aSvbKFuIaLLX2XIxewu4OBrGC_nxxwk5zzXw9f6J36ROAI-SswnBHedd8Q","rarity":"Exotic","rarity_color":"d32ce6","type":"Sticker","weapon":"","exterior":"","name_color":"d32ce6"},{"name":"AK-47 | Asiimov (Factory New)","icon":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIGz3UqlXOLrxM-vMGmW8VNxu5Dx60noTyLwlcK3wiFO0POlPPNSIeOaB2qf19F6ueZhW2e2wEt-t2jcytf6dymSO1JxA5oiRecLsRa5kIfkYr-241aLgotHz3-rkGoXuUp8oX57","icon_small":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIGz3UqlXOLrxM-vMGmW8VNxu5Dx60noTyLwlcK3wiFO0POlPPNSIeOaB2qf19F6ueZhW2e2wEt-t2jcytf6dymSO1JxA5oiRecLsRa5kIfkYr-241aLgotHz3-rkGoXuUp8oX57","rarity":"Covert","rarity_color":"eb4b4b","type":"Rifle","weapon":"AK-47","exterior":"Factory New","name_color":"eb4b4b"},{"name":"\u2605 Sport Gloves | Omega (Minimal Wear)","icon":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIGz3UqlXOLrxM-vMGmW8VNxu5Tk5UvzWCL2kpn2-DFk_OKherB0H_KfD2Sb_vlzsuNgQS6MjBgrvzKSpYPwJiPTcFAkC5UiRrRZ5BO9ktDnM-q37wCMjN5GxCqvhngb6Chj6u0CVvAj-6fJz1aW3nluLgw","icon_small":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIGz3UqlXOLrxM-vMGmW8VNxu5Tk5UvzWCL2kpn2-DFk_OKherB0H_KfD2Sb_vlzsuNgQS6MjBgrvzKSpYPwJiPTcFAkC5UiRrRZ5BO9ktDnM-q37wCMjN5GxCqvhngb6Chj6u0CVvAj-6fJz1aW3nluLgw","rarity":"Extraordinary","rarity_color":"eb4b4b","type":"Gloves","weapon":"","exterior":"Minimal Wear","name_color":"eb4b4b"},{"name":"Sticker | Lynn Vision (Gold) | Copenhagen 2024","icon":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJai0ki7VeTHjMmxPSnHtwI6-J765GbgThH10MTiqyZa6ab2bfw6I_aQVzfBxL8isbcxHi3qwxx1tzmDyNn4cy-RaQY-SswnFoaTor0","icon_small":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJai0ki7VeTHjMmxPSnHtwI6-J765GbgThH10MTiqyZa6ab2bfw6I_aQVzfBxL8isbcxHi3qwxx1tzmDyNn4cy-RaQY-SswnFoaTor0","rarity":"Extraordinary","rarity_color":"eb4b4b","type":"Sticker","weapon":"","exterior":"","name_color":"eb4b4b"},{"name":"Austin 2025 Gold Coin","icon":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJG5zlm-UfvRzd6yenqC9gQlptK760z0E02jy6nj8itV0PWhZKAjcPSXXTCUkuou4bA5SnCwlE5w5znRwt34eHifPQIpApJ2FuEC5ELqmsqnab0HwOPUTg","icon_small":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJG5zlm-UfvRzd6yenqC9gQlptK760z0E02jy6nj8itV0PWhZKAjcPSXXTCUkuou4bA5SnCwlE5w5znRwt34eHifPQIpApJ2FuEC5ELqmsqnab0HwOPUTg","rarity":"Extraordinary","rarity_color":"eb4b4b","type":"Collectible","weapon":"","exterior":"","name_color":"eb4b4b"},{"name":"Krakow 2017 Legends Autograph Capsule","icon":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJKz2lu_XsnXwtmkJjSU91dh8bjn_lDkShjjoYbh_ilk5OCvY6t6cqDCWViX0-FjoN47ASy3xUohtT6Dzd2gc3zBOFR2CpciQLRYtRLrm4LjYr-2s1GIiowWy3jgznQe-cT3vvQ","icon_small":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJKz2lu_XsnXwtmkJjSU91dh8bjn_lDkShjjoYbh_ilk5OCvY6t6cqDCWViX0-FjoN47ASy3xUohtT6Dzd2gc3zBOFR2CpciQLRYtRLrm4LjYr-2s1GIiowWy3jgznQe-cT3vvQ","rarity":"Base Grade","rarity_color":"b0c3d9","type":"Container","weapon":"","exterior":"","name_color":"b0c3d9"},{"name":"\u2605 M9 Bayonet | Lore (Factory New)","icon":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIGz3UqlXOLrxM-vMGmW8VNxu5Dx60noTyL6kJ_m-B1Wts2sab1iLvWHMWSF_uMvj-NoVha_mg8ijDGMnYftbyrBOw52D5R0FOYPtkG6ltOxNrjl4FPdiN0WzC723SxP6ypp6u8LVKY7uvqAFpeI3XY","icon_small":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIGz3UqlXOLrxM-vMGmW8VNxu5Dx60noTyL6kJ_m-B1Wts2sab1iLvWHMWSF_uMvj-NoVha_mg8ijDGMnYftbyrBOw52D5R0FOYPtkG6ltOxNrjl4FPdiN0WzC723SxP6ypp6u8LVKY7uvqAFpeI3XY","rarity":"Covert","rarity_color":"eb4b4b","type":"Knife","weapon":"M9 Bayonet","exterior":"Factory New","name_color":"eb4b4b"},{"name":"2025 Service Medal","icon":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJai2l-lQ8ndwMWvJjSE4ERj_YTx1VTiRRz9ocSwr3dk4-SiOuo8JKLAWjGTmL0k5eQ8GHjml09_4mzUm9z9JSieZgYmXpcjF-JZ5EK-jJS5YGKHMs9j","icon_small":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJai2l-lQ8ndwMWvJjSE4ERj_YTx1VTiRRz9ocSwr3dk4-SiOuo8JKLAWjGTmL0k5eQ8GHjml09_4mzUm9z9JSieZgYmXpcjF-JZ5EK-jJS5YGKHMs9j","rarity":"Extraordinary","rarity_color":"eb4b4b","type":"Collectible","weapon":"","exterior":"","name_color":"eb4b4b"},{"name":"Premier Season One Medal","icon":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJWk3ka5VeTr0M-gJnSZ9hll5oL541z1fg70n4Xv8x0K0PGhYapSJffdDTXIkb4m4rI8Gnq3lkQi5j7cwtn7I3ufPwUoX8BwQ-QPtkOxlYXuNfSiuVIwlMz5Qg","icon_small":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJWk3ka5VeTr0M-gJnSZ9hll5oL541z1fg70n4Xv8x0K0PGhYapSJffdDTXIkb4m4rI8Gnq3lkQi5j7cwtn7I3ufPwUoX8BwQ-QPtkOxlYXuNfSiuVIwlMz5Qg","rarity":"Extraordinary","rarity_color":"eb4b4b","type":"Collectible","weapon":"","exterior":"","name_color":"eb4b4b"},{"name":"StatTrak\u2122 Music Kit | Perfect World, Ay Hey","icon":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIijyEKzb_3d19nuJX6F41N24JD7-FXjfk2j0M7ir3QOvKb8P6A1cPSSXzKSkbl14eU-GCu3x0V24jvWzo6veXuUbAQ-SswnjV5YWxY","icon_small":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIijyEKzb_3d19nuJX6F41N24JD7-FXjfk2j0M7ir3QOvKb8P6A1cPSSXzKSkbl14eU-GCu3x0V24jvWzo6veXuUbAQ-SswnjV5YWxY","rarity":"High Grade","rarity_color":"4b69ff","type":"Music Kit","weapon":"","exterior":"","name_color":"4b69ff"},{"name":"Shanghai 2024 Gold Coin","icon":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJai2l-lQ8ndwMWvJjSH8mll_YT_71TYE02jyqnn8i5fofP5bfQ1JPGSXD_Hk7ly4OVtHC23lhtw5WWGmd2uInuSaAMmXJYmELQU8k7vK4HcGxE","icon_small":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJai2l-lQ8ndwMWvJjSH8mll_YT_71TYE02jyqnn8i5fofP5bfQ1JPGSXD_Hk7ly4OVtHC23lhtw5WWGmd2uInuSaAMmXJYmELQU8k7vK4HcGxE","rarity":"Extraordinary","rarity_color":"eb4b4b","type":"Collectible","weapon":"","exterior":"","name_color":"eb4b4b"},{"name":"Sticker | Gold Teef (Foil)","icon":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJai0ki7VeTHjMmuOHaC619h7cjn_lDkShjjoZXy_CRPoPShYahSLf-GGm_ewr8v6eM6SX23wBwjsj_SyY76eSjFaAR1A8YiF7YNsxO9x9PnMrmwsRue1dydB_NxlQ","icon_small":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJai0ki7VeTHjMmuOHaC619h7cjn_lDkShjjoZXy_CRPoPShYahSLf-GGm_ewr8v6eM6SX23wBwjsj_SyY76eSjFaAR1A8YiF7YNsxO9x9PnMrmwsRue1dydB_NxlQ","rarity":"Exotic","rarity_color":"d32ce6","type":"Sticker","weapon":"","exterior":"","name_color":"d32ce6"},{"name":"Sticker | Glare","icon":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJai0ki7VeTHjMmuOHaC619h7cjn_lDkShjjoZXy_CRPoOKveKF_H_WKCynCmL1zsedqH3HhwRt3sW-Gm9egdCrCOgYjW5QlTOYNtkHuldzlZejm-UWA3EqO61YC","icon_small":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJai0ki7VeTHjMmuOHaC619h7cjn_lDkShjjoZXy_CRPoOKveKF_H_WKCynCmL1zsedqH3HhwRt3sW-Gm9egdCrCOgYjW5QlTOYNtkHuldzlZejm-UWA3EqO61YC","rarity":"High Grade","rarity_color":"4b69ff","type":"Sticker","weapon":"","exterior":"","name_color":"4b69ff"},{"name":"2024 Service Medal","icon":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJai2l-lQ8ndwMWvJjSE4ERj_YTx1VTiRRz9ocSwr3Zk4-SiOepscfbBXT7Bluog4eAwHXrikBty4TjQmNmgJ3-WOgMkCpojR7Nbt0W8jJS5YEtg4Ojj","icon_small":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJai2l-lQ8ndwMWvJjSE4ERj_YTx1VTiRRz9ocSwr3Zk4-SiOepscfbBXT7Bluog4eAwHXrikBty4TjQmNmgJ3-WOgMkCpojR7Nbt0W8jJS5YEtg4Ojj","rarity":"Extraordinary","rarity_color":"eb4b4b","type":"Collectible","weapon":"","exterior":"","name_color":"eb4b4b"},{"name":"Copenhagen 2024 Contenders Autograph Capsule","icon":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJKz2lu_XsnXwtmkJjSU91dh8bjn_lDkShjjoYbh_ilk7OKmOvQ_dM-UHGiF0dF1v-99Sie3kA80_W3QmNuvICmeOwMmWMMlTe5bsxa8x9TkP-nrtVTc349Cm3793SgY7yZ1o7FVloVngOw","icon_small":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJKz2lu_XsnXwtmkJjSU91dh8bjn_lDkShjjoYbh_ilk7OKmOvQ_dM-UHGiF0dF1v-99Sie3kA80_W3QmNuvICmeOwMmWMMlTe5bsxa8x9TkP-nrtVTc349Cm3793SgY7yZ1o7FVloVngOw","rarity":"Base Grade","rarity_color":"b0c3d9","type":"Container","weapon":"","exterior":"","name_color":"b0c3d9"},{"name":"Copenhagen 2024 Legends Autograph Capsule","icon":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJKz2lu_XsnXwtmkJjSU91dh8bjn_lDkShjjoYbh_ilk7OKmOvQ_dM-UHGiF0dF6teZsQS2g2xkkt2-AyN6sJX7BOgB1DpImF-UL4EG4xoC1Yr-35lbYjIhEzymshy9XrnE8aQftiTI","icon_small":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJKz2lu_XsnXwtmkJjSU91dh8bjn_lDkShjjoYbh_ilk7OKmOvQ_dM-UHGiF0dF6teZsQS2g2xkkt2-AyN6sJX7BOgB1DpImF-UL4EG4xoC1Yr-35lbYjIhEzymshy9XrnE8aQftiTI","rarity":"Base Grade","rarity_color":"b0c3d9","type":"Container","weapon":"","exterior":"","name_color":"b0c3d9"},{"name":"Souvenir AUG | Sand Storm (Field-Tested)","icon":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIGz3UqlXOLrxM-vMGmW8VNxu5Dx60noTyLwi5Hf-jFk7uepV7dsLvSsHXOf0-NJveRtRjy-2x8lsG-DmNyoJS6XOg8iDZYjTbZesBHpkIXhZrzi4FSKg4xFyy79iXlXrnE8YZS7Dho","icon_small":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIGz3UqlXOLrxM-vMGmW8VNxu5Dx60noTyLwi5Hf-jFk7uepV7dsLvSsHXOf0-NJveRtRjy-2x8lsG-DmNyoJS6XOg8iDZYjTbZesBHpkIXhZrzi4FSKg4xFyy79iXlXrnE8YZS7Dho","rarity":"Restricted","rarity_color":"8847ff","type":"Rifle","weapon":"AUG","exterior":"Field-Tested","name_color":"8847ff"},{"name":"Copenhagen 2024 Gold Coin","icon":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJai2l-lQ8ndwMWvJjSH4lpK5I734Vzqfk-hzMLf-i1X67yoa_U-dajCCDCTkr4isbk7GivkxUt-sjvUwt76eH6QOwEoDJUmTbILrFDmxf3YGlYO","icon_small":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJai2l-lQ8ndwMWvJjSH4lpK5I734Vzqfk-hzMLf-i1X67yoa_U-dajCCDCTkr4isbk7GivkxUt-sjvUwt76eH6QOwEoDJUmTbILrFDmxf3YGlYO","rarity":"Extraordinary","rarity_color":"eb4b4b","type":"Collectible","weapon":"","exterior":"","name_color":"eb4b4b"},{"name":"Paris 2023 Legends Sticker Capsule","icon":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJKz2lu_XsnXwtmkJjSU91dh8bjn_lDkShjjoYbh_ilk__O8Ybc_cKLAMWuVxut4tPInTi_qwUR_5m_TmN79cHyfagMgA8cjQuEMsUW-x4K1P-Ozs1TZ34hNxDK-0H34xwtSCg","icon_small":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJKz2lu_XsnXwtmkJjSU91dh8bjn_lDkShjjoYbh_ilk__O8Ybc_cKLAMWuVxut4tPInTi_qwUR_5m_TmN79cHyfagMgA8cjQuEMsUW-x4K1P-Ozs1TZ34hNxDK-0H34xwtSCg","rarity":"Base Grade","rarity_color":"b0c3d9","type":"Container","weapon":"","exterior":"","name_color":"b0c3d9"},{"name":"Music Kit | Valve, CS:GO","icon":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIijyEKzb_3d19nuI3qb81NKpNa66wu1Qx-mm8Kx-CYC6aD2bv0-IfPFWGHIkegh5LY4GXzlxU905W7UwsHpLywWgep6oQ","icon_small":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIijyEKzb_3d19nuI3qb81NKpNa66wu1Qx-mm8Kx-CYC6aD2bv0-IfPFWGHIkegh5LY4GXzlxU905W7UwsHpLywWgep6oQ","rarity":"High Grade","rarity_color":"4b69ff","type":"Music Kit","weapon":"","exterior":"","name_color":"4b69ff"},{"name":"Global Offensive Badge","icon":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJai2l-lQ8ndwMWvJjSU6l97y4Tn7VapFB6kzsLmrXcP7vSvMfY_d6jAWTfHlLZ34rA4GXrnlkh052_TwomvdWXXMFHAFOJ0XQ","icon_small":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJai2l-lQ8ndwMWvJjSU6l97y4Tn7VapFB6kzsLmrXcP7vSvMfY_d6jAWTfHlLZ34rA4GXrnlkh052_TwomvdWXXMFHAFOJ0XQ","rarity":"Extraordinary","rarity_color":"eb4b4b","type":"Collectible","weapon":"","exterior":"","name_color":"eb4b4b"},{"name":"Paris 2023 Challengers Sticker Capsule","icon":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJKz2lu_XsnXwtmkJjSU91dh8bjn_lDkShjjoYbh_ilk__O8Ybc_cKLAMWSYwOJ6te9uSjug2x8isG7czNageS2VaAIoD8ZxRbYNsBa4x9XvZO7r4wyK395AmS782H5XrnE8Sh4_4i8","icon_small":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJKz2lu_XsnXwtmkJjSU91dh8bjn_lDkShjjoYbh_ilk__O8Ybc_cKLAMWSYwOJ6te9uSjug2x8isG7czNageS2VaAIoD8ZxRbYNsBa4x9XvZO7r4wyK395AmS782H5XrnE8Sh4_4i8","rarity":"Base Grade","rarity_color":"b0c3d9","type":"Container","weapon":"","exterior":"","name_color":"b0c3d9"},{"name":"Paris 2023 Challengers Autograph Capsule","icon":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJKz2lu_XsnXwtmkJjSU91dh8bjn_lDkShjjoYbh_ilk__O8Ybc_cKLAMWCCzvtmj-JhTiW_kBMgti-W1NypdnKRPQMiCMQjFrELt0Ltld3iNu625QePjtoWxCj_h35K63tvsL0cEf1yg7EGlt4","icon_small":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJKz2lu_XsnXwtmkJjSU91dh8bjn_lDkShjjoYbh_ilk__O8Ybc_cKLAMWCCzvtmj-JhTiW_kBMgti-W1NypdnKRPQMiCMQjFrELt0Ltld3iNu625QePjtoWxCj_h35K63tvsL0cEf1yg7EGlt4","rarity":"Base Grade","rarity_color":"b0c3d9","type":"Container","weapon":"","exterior":"","name_color":"b0c3d9"},{"name":"Paris 2023 Legends Autograph Capsule","icon":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJKz2lu_XsnXwtmkJjSU91dh8bjn_lDkShjjoYbh_ilk__O8Ybc_cKLAMWCCzvtmj-1sSCy9kQ5psmqAntj6J36XOwEnA8ZwFOYL4xjrwNflMLzm4gGK2d1GmX35iHtKuzErvbjl0YshDg","icon_small":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJKz2lu_XsnXwtmkJjSU91dh8bjn_lDkShjjoYbh_ilk__O8Ybc_cKLAMWCCzvtmj-1sSCy9kQ5psmqAntj6J36XOwEnA8ZwFOYL4xjrwNflMLzm4gGK2d1GmX35iHtKuzErvbjl0YshDg","rarity":"Base Grade","rarity_color":"b0c3d9","type":"Container","weapon":"","exterior":"","name_color":"b0c3d9"},{"name":"Paris 2023 Contenders Sticker Capsule","icon":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJKz2lu_XsnXwtmkJjSU91dh8bjn_lDkShjjoYbh_ilk__O8Ybc_cKLAMWSfz_pzvuVsXTr9kRki5m_Uwtz7cXKWO1ApCcByRLEO50LtkoWyP7_k4Afdi99GniT4jzQJsHjtsZcvVQ","icon_small":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJKz2lu_XsnXwtmkJjSU91dh8bjn_lDkShjjoYbh_ilk__O8Ybc_cKLAMWSfz_pzvuVsXTr9kRki5m_Uwtz7cXKWO1ApCcByRLEO50LtkoWyP7_k4Afdi99GniT4jzQJsHjtsZcvVQ","rarity":"Base Grade","rarity_color":"b0c3d9","type":"Container","weapon":"","exterior":"","name_color":"b0c3d9"},{"name":"Paris 2023 Contenders Autograph Capsule","icon":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJKz2lu_XsnXwtmkJjSU91dh8bjn_lDkShjjoYbh_ilk__O8Ybc_cKLAMWCCzvtmj-JmQT22mxkioS7Lm9yvIi_BbVB2WMB1E-IL4xW5kNGyPu_qsVPYiN1HxCyriCwf7ys5sPFCD_TXdwVgyQ","icon_small":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJKz2lu_XsnXwtmkJjSU91dh8bjn_lDkShjjoYbh_ilk__O8Ybc_cKLAMWCCzvtmj-JmQT22mxkioS7Lm9yvIi_BbVB2WMB1E-IL4xW5kNGyPu_qsVPYiN1HxCyriCwf7ys5sPFCD_TXdwVgyQ","rarity":"Base Grade","rarity_color":"b0c3d9","type":"Container","weapon":"","exterior":"","name_color":"b0c3d9"},{"name":"Cmdr. Davida 'Goggles' Fernandez | SEAL Frogman","icon":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIa-2lmxU-LR0dnuNm6E8Vl45Iv181z1fh7lk6nk9DRe_c24abZkIf6HDymVwLhz4rJsHH6xzEQk5zyDydaudi6XZwJxDJUkRrIItULpw4W1Ybvk-UWA3FCleMc7","icon_small":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIa-2lmxU-LR0dnuNm6E8Vl45Iv181z1fh7lk6nk9DRe_c24abZkIf6HDymVwLhz4rJsHH6xzEQk5zyDydaudi6XZwJxDJUkRrIItULpw4W1Ybvk-UWA3FCleMc7","rarity":"Master","rarity_color":"eb4b4b","type":"Agent","weapon":"","exterior":"","name_color":"eb4b4b"},{"name":"P90 | ScaraB Rush (Factory New)","icon":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIGz3UqlXOLrxM-vMGmW8VNxu5Dx60noTyLhx8bf_jdk_6v-V7duIeKSDFifx9FhufJtQCSMmRQguynLmYmrdCnGPAUkD5BxQuYC5hO8wdK0Y-_nsgbciNhMyn6v238cuy1jsPFCD_S-VwnSrw","icon_small":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIGz3UqlXOLrxM-vMGmW8VNxu5Dx60noTyLhx8bf_jdk_6v-V7duIeKSDFifx9FhufJtQCSMmRQguynLmYmrdCnGPAUkD5BxQuYC5hO8wdK0Y-_nsgbciNhMyn6v238cuy1jsPFCD_S-VwnSrw","rarity":"Restricted","rarity_color":"8847ff","type":"SMG","weapon":"P90","exterior":"Factory New","name_color":"8847ff"},{"name":"Sticker | k0nfig (Glitter) | Paris 2023","icon":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJai0ki7VeTHjNqgJ3KEtwYnp8jn417YSk3_mJ_nwiVX5ua6bbYjJKbHXjDJmbsu5eI4SnzhzUgksG3QmYz9dXqSOAYnDpohTLQPsxLtw8qnab1epqY35w","icon_small":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJai0ki7VeTHjNqgJ3KEtwYnp8jn417YSk3_mJ_nwiVX5ua6bbYjJKbHXjDJmbsu5eI4SnzhzUgksG3QmYz9dXqSOAYnDpohTLQPsxLtw8qnab1epqY35w","rarity":"Remarkable","rarity_color":"8847ff","type":"Sticker","weapon":"","exterior":"","name_color":"8847ff"},{"name":"Krakow 2017 Challengers Autograph Capsule","icon":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJKz2lu_XsnXwtmkJjSU91dh8bjn_lDkShjjoYbh_ilk5OCvY6t6cqDCWViX0-FjoN44ASq3lEkj6mzRytuocy7BOARxCpNzRu5ftxC4kdPkY7iz4gGL2YgQxCXgznQeuZva5XY","icon_small":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJKz2lu_XsnXwtmkJjSU91dh8bjn_lDkShjjoYbh_ilk5OCvY6t6cqDCWViX0-FjoN44ASq3lEkj6mzRytuocy7BOARxCpNzRu5ftxC4kdPkY7iz4gGL2YgQxCXgznQeuZva5XY","rarity":"Base Grade","rarity_color":"b0c3d9","type":"Container","weapon":"","exterior":"","name_color":"b0c3d9"},{"name":"Sticker | F1KU (Glitter) | Paris 2023","icon":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJai0ki7VeTHjNqgJ3KEtwYnp8jn417YR0z6i6nn8StP-_e8JqE0IfaRXj7GkOgv6OVrFyvhzE90t2qGy478dnnCawYhXJd1RbEDtxmm0oqwozE7mZ4","icon_small":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJai0ki7VeTHjNqgJ3KEtwYnp8jn417YR0z6i6nn8StP-_e8JqE0IfaRXj7GkOgv6OVrFyvhzE90t2qGy478dnnCawYhXJd1RbEDtxmm0oqwozE7mZ4","rarity":"Remarkable","rarity_color":"8847ff","type":"Sticker","weapon":"","exterior":"","name_color":"8847ff"},{"name":"Paris 2023 Gold Coin","icon":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJai2l-lQ8ndwMWvJjSV6Vdm4Ljk41rsRBDOzMayrh1c4P6qJqBoc6nAWzXHwrh1srYxSyrnxkshtWyGyYv9dC6Xa1AnDcNwRrQLthOm0oqwXmaXZ84","icon_small":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJai2l-lQ8ndwMWvJjSV6Vdm4Ljk41rsRBDOzMayrh1c4P6qJqBoc6nAWzXHwrh1srYxSyrnxkshtWyGyYv9dC6Xa1AnDcNwRrQLthOm0oqwXmaXZ84","rarity":"Extraordinary","rarity_color":"eb4b4b","type":"Collectible","weapon":"","exterior":"","name_color":"eb4b4b"},{"name":"2023 Service Medal","icon":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJai2l-lQ8ndwMWvJjSE4ERj_YTx1VTiRRz9ocSwr3Fk4-SiO-pseKmSXzXAkux0tLMwF3vkkUp_52zXnNiqJX3Bb1MpXJF1Q-8Is0bsjJS5YObhgPrM","icon_small":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJai2l-lQ8ndwMWvJjSE4ERj_YTx1VTiRRz9ocSwr3Fk4-SiO-pseKmSXzXAkux0tLMwF3vkkUp_52zXnNiqJX3Bb1MpXJF1Q-8Is0bsjJS5YObhgPrM","rarity":"Extraordinary","rarity_color":"eb4b4b","type":"Collectible","weapon":"","exterior":"","name_color":"eb4b4b"},{"name":"Graffiti | Bling (Tracer Yellow)","icon":"https://community.fastly.steamstatic.com/economy/image/IzMF03bi9WpSBq-S-ekoE33L-iLqGFHVaU25ZzQNQcXdB2ozio1RrlIWFK3UfvMYB8UsvjiMXojflsZalyxSh31CIyHz2GZ-KuFpPsrTzBG0r-eOF3j2azL7Ky7VEF96U-dfPT6PqzH05byVSjzJEu99Fw4EfPYG8jBIPZiJaxo5hYZf8jfpzh0zDhgvNMZJfACpx2EfJbQ1xDhPIZ8BkCGihQey0_I","icon_small":"https://community.fastly.steamstatic.com/economy/image/IzMF03bi9WpSBq-S-ekoE33L-iLqGFHVaU25ZzQNQcXdB2ozio1RrlIWFK3UfvMYB8UsvjiMXojflsZalyxSh31CIyHz2GZ-KuFpPsrTzBG0r-eOF3j2azL7Ky7VEF96U-dfPT6PqzH05byVSjzJEu99Fw4EfPYG8jBIPZiJaxo5hYZf8jfpzh0zDhgvNMZJfACpx2EfJbQ1xDhPIZ8BkCGihQey0_I","rarity":"Base Grade","rarity_color":"b0c3d9","type":"Graffiti","weapon":"","exterior":"","name_color":"b0c3d9"},{"name":"Rio 2022 Challengers Sticker Capsule","icon":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJKz2lu_XsnXwtmkJjSU91dh8bjn_lDkShjjoYbh_ilk_fuhOvQ_cs-QBmaczet4t-R7XGe3zU9w6jzdn9qseSiQOlJxCJMjTbFZtUTtwNHuMb6xslfXiYhBmS-okGoXuQCBMtXd","icon_small":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJKz2lu_XsnXwtmkJjSU91dh8bjn_lDkShjjoYbh_ilk_fuhOvQ_cs-QBmaczet4t-R7XGe3zU9w6jzdn9qseSiQOlJxCJMjTbFZtUTtwNHuMb6xslfXiYhBmS-okGoXuQCBMtXd","rarity":"Base Grade","rarity_color":"b0c3d9","type":"Container","weapon":"","exterior":"","name_color":"b0c3d9"},{"name":"Rio 2022 Legends Autograph Capsule","icon":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJKz2lu_XsnXwtmkJjSU91dh8bjn_lDkShjjoYbh_ilk_fuhOvQ_cs-UHGiF0dF6teZsQS2g2xt352zSn9_8c3mWPAUhW5BwELYJuhntkIG0Prnq4gDe2YxDmH72iChXrnE87oX_dko","icon_small":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJKz2lu_XsnXwtmkJjSU91dh8bjn_lDkShjjoYbh_ilk_fuhOvQ_cs-UHGiF0dF6teZsQS2g2xt352zSn9_8c3mWPAUhW5BwELYJuhntkIG0Prnq4gDe2YxDmH72iChXrnE87oX_dko","rarity":"Base Grade","rarity_color":"b0c3d9","type":"Container","weapon":"","exterior":"","name_color":"b0c3d9"},{"name":"Rio 2022 Contenders Sticker Capsule","icon":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJKz2lu_XsnXwtmkJjSU91dh8bjn_lDkShjjoYbh_ilk_fuhOvQ_cs-QAWmExOBytfN6AXrjkEQm5DvRm9yqInKeOFUhDsR2QLJf5BS4m9PhZb6wsgDWg4gWy3jgznQerfXjWvk","icon_small":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJKz2lu_XsnXwtmkJjSU91dh8bjn_lDkShjjoYbh_ilk_fuhOvQ_cs-QAWmExOBytfN6AXrjkEQm5DvRm9yqInKeOFUhDsR2QLJf5BS4m9PhZb6wsgDWg4gWy3jgznQerfXjWvk","rarity":"Base Grade","rarity_color":"b0c3d9","type":"Container","weapon":"","exterior":"","name_color":"b0c3d9"},{"name":"Rio 2022 Challengers Autograph Capsule","icon":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJKz2lu_XsnXwtmkJjSU91dh8bjn_lDkShjjoYbh_ilk_fuhOvQ_cs-UHGiF0dF1uOBlQyy9khg1oHPczI77cSmeOwQgD5V3Ee9b5BXqmtGyZe_n7lHaiYtGnCus2Hgb6n5v_a9cBttjt0pr","icon_small":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJKz2lu_XsnXwtmkJjSU91dh8bjn_lDkShjjoYbh_ilk_fuhOvQ_cs-UHGiF0dF1uOBlQyy9khg1oHPczI77cSmeOwQgD5V3Ee9b5BXqmtGyZe_n7lHaiYtGnCus2Hgb6n5v_a9cBttjt0pr","rarity":"Base Grade","rarity_color":"b0c3d9","type":"Container","weapon":"","exterior":"","name_color":"b0c3d9"},{"name":"Rio 2022 Contenders Autograph Capsule","icon":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJKz2lu_XsnXwtmkJjSU91dh8bjn_lDkShjjoYbh_ilk_fuhOvQ_cs-UHGiF0dF1v-99Sie3kA80_WrVyt38dXLBbwQpWJJ2FuULtxm6xtHkNuLksg3cid9Hzyr23yhOuiZ1o7FV0uHCYTs","icon_small":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJKz2lu_XsnXwtmkJjSU91dh8bjn_lDkShjjoYbh_ilk_fuhOvQ_cs-UHGiF0dF1v-99Sie3kA80_WrVyt38dXLBbwQpWJJ2FuULtxm6xtHkNuLksg3cid9Hzyr23yhOuiZ1o7FV0uHCYTs","rarity":"Base Grade","rarity_color":"b0c3d9","type":"Container","weapon":"","exterior":"","name_color":"b0c3d9"},{"name":"Rio 2022 Legends Sticker Capsule","icon":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJKz2lu_XsnXwtmkJjSU91dh8bjn_lDkShjjoYbh_ilk_fuhOvQ_cs-fC2CVz-pl_uQ_GXvmxxkmtjzRzdaqJX2XZwclDZVxR-de5BK4w4CxMLux71Tb3Y9bjXKp7ETU0XM","icon_small":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJKz2lu_XsnXwtmkJjSU91dh8bjn_lDkShjjoYbh_ilk_fuhOvQ_cs-fC2CVz-pl_uQ_GXvmxxkmtjzRzdaqJX2XZwclDZVxR-de5BK4w4CxMLux71Tb3Y9bjXKp7ETU0XM","rarity":"Base Grade","rarity_color":"b0c3d9","type":"Container","weapon":"","exterior":"","name_color":"b0c3d9"},{"name":"Rio 2022 Gold Coin","icon":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJai2l-lQ8ndwMWvJjSe4FtK5I734Vzqfk-hzMTf-i1X67ytOPA_d6XCCzfGk7gg5OBoGC3qzUR1tTnXnNegJ3ifPFUgCJdzQLEMrFDmxSrceZP6","icon_small":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJai2l-lQ8ndwMWvJjSe4FtK5I734Vzqfk-hzMTf-i1X67ytOPA_d6XCCzfGk7gg5OBoGC3qzUR1tTnXnNegJ3ifPFUgCJdzQLEMrFDmxSrceZP6","rarity":"Extraordinary","rarity_color":"eb4b4b","type":"Collectible","weapon":"","exterior":"","name_color":"eb4b4b"},{"name":"StatTrak\u2122 Music Kit | Perfect World, \u82b1\u8138 Hua Lian (Painted Face)","icon":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIijyEKzb_3d19nuJX6F41N24JD7-FXjfk2g0MLlqScOt6L7PPxrdfTLX2HDkbgi4OM7TX2wkRsm6j-Ewor8InueOwY-Sswnc1NbBcg","icon_small":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIijyEKzb_3d19nuJX6F41N24JD7-FXjfk2g0MLlqScOt6L7PPxrdfTLX2HDkbgi4OM7TX2wkRsm6j-Ewor8InueOwY-Sswnc1NbBcg","rarity":"High Grade","rarity_color":"4b69ff","type":"Music Kit","weapon":"","exterior":"","name_color":"4b69ff"},{"name":"StatTrak\u2122 Music Kit | Knock2, dashstar*","icon":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIijyEKzb_3d19nuPnWY5l0ny9elpFuwQhugx8G0qXVavqT_avw_I6HCDT-Vk-oi5rFtGnjjkBxy6zyGmNu3MSXAuEzdSoI","icon_small":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIijyEKzb_3d19nuPnWY5l0ny9elpFuwQhugx8G0qXVavqT_avw_I6HCDT-Vk-oi5rFtGnjjkBxy6zyGmNu3MSXAuEzdSoI","rarity":"High Grade","rarity_color":"4b69ff","type":"Music Kit","weapon":"","exterior":"","name_color":"4b69ff"},{"name":"10 Year Birthday Coin","icon":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJai2l-lQ8ndwMWvJjSU8EZ29Yzx1Qi3fgT0n4SuqHdd6_D6PaBvJqDDW2HDlLtz5bBqF3qylEV-5WiEntyuJC6XZlUiCowwG7CjZjWpfA","icon_small":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJai2l-lQ8ndwMWvJjSU8EZ29Yzx1Qi3fgT0n4SuqHdd6_D6PaBvJqDDW2HDlLtz5bBqF3qylEV-5WiEntyuJC6XZlUiCowwG7CjZjWpfA","rarity":"Extraordinary","rarity_color":"eb4b4b","type":"Collectible","weapon":"","exterior":"","name_color":"eb4b4b"},{"name":"Sawed-Off | Highwayman (Factory New)","icon":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIGz3UqlXOLrxM-vMGmW8VNxu5Dx60noTyLin4Hl-S1d6c2veZt-IeeWCmiWx9F0vOBqRC68mRkYvzSCkpu3dXuVaQchCMRwQeJYsxaxl9W0N-nrtVeMid4XyHn53XtN5n5st-xRU71lpPM2tqJ-2A","icon_small":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIGz3UqlXOLrxM-vMGmW8VNxu5Dx60noTyLin4Hl-S1d6c2veZt-IeeWCmiWx9F0vOBqRC68mRkYvzSCkpu3dXuVaQchCMRwQeJYsxaxl9W0N-nrtVeMid4XyHn53XtN5n5st-xRU71lpPM2tqJ-2A","rarity":"Restricted","rarity_color":"8847ff","type":"Shotgun","weapon":"Sawed-Off","exterior":"Factory New","name_color":"8847ff"},{"name":"Antwerp 2022 Challengers Sticker Capsule","icon":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJKz2lu_XsnXwtmkJjSU91dh8bjn_lDkShjjoYbh_ilk7vy6f6F_MKLDXDWvwuZ3vO1sQS62hw5p5WWDno6veHmXbA8nWJcmFuQPukKxw4HgYuuwsgTb3tlEyST7iC1P7TErvbjE7qnGag","icon_small":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJKz2lu_XsnXwtmkJjSU91dh8bjn_lDkShjjoYbh_ilk7vy6f6F_MKLDXDWvwuZ3vO1sQS62hw5p5WWDno6veHmXbA8nWJcmFuQPukKxw4HgYuuwsgTb3tlEyST7iC1P7TErvbjE7qnGag","rarity":"Base Grade","rarity_color":"b0c3d9","type":"Container","weapon":"","exterior":"","name_color":"b0c3d9"},{"name":"Antwerp 2022 Challengers Autograph Capsule","icon":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJKz2lu_XsnXwtmkJjSU91dh8bjn_lDkShjjoYbh_ilk7vy6f6F_MKLDXDWvxvx5pfFWTCGymREivTqAiJy3dHqXOlV0C8AmR7VY5xPrkNPhN7jksQHei9pNxXj4jSwcu345t7lTUb1lpPPGirj51Q","icon_small":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJKz2lu_XsnXwtmkJjSU91dh8bjn_lDkShjjoYbh_ilk7vy6f6F_MKLDXDWvxvx5pfFWTCGymREivTqAiJy3dHqXOlV0C8AmR7VY5xPrkNPhN7jksQHei9pNxXj4jSwcu345t7lTUb1lpPPGirj51Q","rarity":"Base Grade","rarity_color":"b0c3d9","type":"Container","weapon":"","exterior":"","name_color":"b0c3d9"},{"name":"Antwerp 2022 Contenders Autograph Capsule","icon":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJKz2lu_XsnXwtmkJjSU91dh8bjn_lDkShjjoYbh_ilk7vy6f6F_MKLDXDWvxvx5pfFWTCa9gRgptziXicGpeCjEbFAhXJshELECu0Wwl93uMO_h5AWNg9pCziSqhn5L6Hxu4OsBT-N7rSAkzLwR","icon_small":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJKz2lu_XsnXwtmkJjSU91dh8bjn_lDkShjjoYbh_ilk7vy6f6F_MKLDXDWvxvx5pfFWTCa9gRgptziXicGpeCjEbFAhXJshELECu0Wwl93uMO_h5AWNg9pCziSqhn5L6Hxu4OsBT-N7rSAkzLwR","rarity":"Base Grade","rarity_color":"b0c3d9","type":"Container","weapon":"","exterior":"","name_color":"b0c3d9"},{"name":"Antwerp 2022 Contenders Sticker Capsule","icon":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJKz2lu_XsnXwtmkJjSU91dh8bjn_lDkShjjoYbh_ilk7vy6f6F_MKLDXDWvwuF4pORnSyyhhlN2tjjVzdmvICjEbFVzAsQjFO5b5xDrw9HnMuPj4gPejY4TzCX_jX5B8G81tAUYRCK3","icon_small":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJKz2lu_XsnXwtmkJjSU91dh8bjn_lDkShjjoYbh_ilk7vy6f6F_MKLDXDWvwuF4pORnSyyhhlN2tjjVzdmvICjEbFVzAsQjFO5b5xDrw9HnMuPj4gPejY4TzCX_jX5B8G81tAUYRCK3","rarity":"Base Grade","rarity_color":"b0c3d9","type":"Container","weapon":"","exterior":"","name_color":"b0c3d9"},{"name":"Antwerp 2022 Gold Coin","icon":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJai2l-lQ8ndwMWvJjSH4lpK5I734Vzqfk-hzMTf-i1X67yvO_U0ePPHWTaSk7h04rA9SS3glBgh62vTy4qgIHqQblIoW8B5TOQLrFDmxYlL6uqC","icon_small":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJai2l-lQ8ndwMWvJjSH4lpK5I734Vzqfk-hzMTf-i1X67yvO_U0ePPHWTaSk7h04rA9SS3glBgh62vTy4qgIHqQblIoW8B5TOQLrFDmxYlL6uqC","rarity":"Extraordinary","rarity_color":"eb4b4b","type":"Collectible","weapon":"","exterior":"","name_color":"eb4b4b"},{"name":"Clutch Case","icon":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJKz2lu_XsnXwtmkJjSU91dh8bj35VTqVBP4io_frHsVtqr8a_dsdKTAWDWVxLgjsrAwHSvgwEQk4m-ByYuqIC2eO1VyD5QiR_lK7EcxQQPYQA","icon_small":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJKz2lu_XsnXwtmkJjSU91dh8bj35VTqVBP4io_frHsVtqr8a_dsdKTAWDWVxLgjsrAwHSvgwEQk4m-ByYuqIC2eO1VyD5QiR_lK7EcxQQPYQA","rarity":"Base Grade","rarity_color":"b0c3d9","type":"Container","weapon":"","exterior":"","name_color":"b0c3d9"},{"name":"2022 Service Medal","icon":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJai2l-lQ8ndwMWvJjSE4ERj_YTx1VTiRRz9ocSwr3Bk4-SiOupoJvOXX2KTxL4m6bI4HnG1zBh15G2HnNaqeHrEP1VzWcNwQeBYsRO5jJS5YHsl6s_-","icon_small":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJai2l-lQ8ndwMWvJjSE4ERj_YTx1VTiRRz9ocSwr3Bk4-SiOupoJvOXX2KTxL4m6bI4HnG1zBh15G2HnNaqeHrEP1VzWcNwQeBYsRO5jJS5YHsl6s_-","rarity":"Extraordinary","rarity_color":"eb4b4b","type":"Collectible","weapon":"","exterior":"","name_color":"eb4b4b"},{"name":"Patch | Hydra","icon":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJW3z0i4VeWbwMuyMCvGqkZ04IT81VH-RQ_w0JKwpCBdu_P3OqY6JvHKV2XIlLcjtOcwTHvgwkx-5zvWzYr9JXKUagM-SswnBsU963w","icon_small":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJW3z0i4VeWbwMuyMCvGqkZ04IT81VH-RQ_w0JKwpCBdu_P3OqY6JvHKV2XIlLcjtOcwTHvgwkx-5zvWzYr9JXKUagM-SswnBsU963w","rarity":"High Grade","rarity_color":"4b69ff","type":"Patch","weapon":"","exterior":"","name_color":"4b69ff"},{"name":"XM1014 | Teclu Burner (Factory New)","icon":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIGz3UqlXOLrxM-vMGmW8VNxu5Dx60noTyLpk8ewrHZk7uORcKk8cKHHMW-f1dFkv-VWQyC0nQlptj_Tn9v4J3zEbVIjCZEkELRcska_x4DmNumz4QHWjYtNxSSqjSNAuzErvbjrIzaCAA","icon_small":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIGz3UqlXOLrxM-vMGmW8VNxu5Dx60noTyLpk8ewrHZk7uORcKk8cKHHMW-f1dFkv-VWQyC0nQlptj_Tn9v4J3zEbVIjCZEkELRcska_x4DmNumz4QHWjYtNxSSqjSNAuzErvbjrIzaCAA","rarity":"Restricted","rarity_color":"8847ff","type":"Shotgun","weapon":"XM1014","exterior":"Factory New","name_color":"8847ff"},{"name":"MAG-7 | Bulldozer (Field-Tested)","icon":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIGz3UqlXOLrxM-vMGmW8VNxu5Dx60noTyL8n5G3wjFU0OurZKhiN8-eC2OZ1OM4srgwGCq1w0gjsjzRzIupIHKWPwRxC5d0EeUPuhHqx9GxNrvq7gfW2JUFk3udy8CKeQ","icon_small":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIGz3UqlXOLrxM-vMGmW8VNxu5Dx60noTyL8n5G3wjFU0OurZKhiN8-eC2OZ1OM4srgwGCq1w0gjsjzRzIupIHKWPwRxC5d0EeUPuhHqx9GxNrvq7gfW2JUFk3udy8CKeQ","rarity":"Restricted","rarity_color":"8847ff","type":"Shotgun","weapon":"MAG-7","exterior":"Field-Tested","name_color":"8847ff"},{"name":"Galil AR | Chatterbox (Well-Worn)","icon":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIGz3UqlXOLrxM-vMGmW8VNxu5Dx60noTyL2n5rp8SNJ0PG7V6NsLPmfMWaS0-9lue5ncCS2kRQyvnPXnIn7eSrEZ1AnD5NxTeII4ESwxN3jN7zl5QHXjdhAnyuo2y9Nv3xs_a9cBuAhdjfO","icon_small":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIGz3UqlXOLrxM-vMGmW8VNxu5Dx60noTyL2n5rp8SNJ0PG7V6NsLPmfMWaS0-9lue5ncCS2kRQyvnPXnIn7eSrEZ1AnD5NxTeII4ESwxN3jN7zl5QHXjdhAnyuo2y9Nv3xs_a9cBuAhdjfO","rarity":"Covert","rarity_color":"eb4b4b","type":"Rifle","weapon":"Galil AR","exterior":"Well-Worn","name_color":"eb4b4b"},{"name":"Sticker | Kill Count (Holo)","icon":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJai0ki7VeTHjMWxCmme9UJ88IK74VDrTSLykYPu6R1T4P6hJvBpdvHHDGHDlegis7k6TXzrzEpx4m_WyYyvIHuSaQ8mXMZ2TeRZtkGm0oqwhgiBjmk","icon_small":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJai0ki7VeTHjMWxCmme9UJ88IK74VDrTSLykYPu6R1T4P6hJvBpdvHHDGHDlegis7k6TXzrzEpx4m_WyYyvIHuSaQ8mXMZ2TeRZtkGm0oqwhgiBjmk","rarity":"Remarkable","rarity_color":"8847ff","type":"Sticker","weapon":"","exterior":"","name_color":"8847ff"},{"name":"Sticker | Liquid Fire","icon":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJai0ki7VeTHjMWxCmme9UJ88IK7-FD0SBP2oYLp-Sdk__O-bbYjd6fCVz_Fk-0u5OU5Gnzhlkp0427Tz9n_IH7EOAMkDpB4FLQO4xnrkMqnab0e46H08A","icon_small":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJai0ki7VeTHjMWxCmme9UJ88IK7-FD0SBP2oYLp-Sdk__O-bbYjd6fCVz_Fk-0u5OU5Gnzhlkp0427Tz9n_IH7EOAMkDpB4FLQO4xnrkMqnab0e46H08A","rarity":"High Grade","rarity_color":"4b69ff","type":"Sticker","weapon":"","exterior":"","name_color":"4b69ff"},{"name":"Sticker | Great Wave (Holo)","icon":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJai0ki7VeTHjMWxCmme9UJ88IK77UviQAnOiZf2-B1T4P6hJqdpdKjGXWLFwuok57A5GiuxzUpx526HnIr8eSmVPAIgXpQjR7UCshem0oqwjJ5Mgk4","icon_small":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJai0ki7VeTHjMWxCmme9UJ88IK77UviQAnOiZf2-B1T4P6hJqdpdKjGXWLFwuok57A5GiuxzUpx526HnIr8eSmVPAIgXpQjR7UCshem0oqwjJ5Mgk4","rarity":"Remarkable","rarity_color":"8847ff","type":"Sticker","weapon":"","exterior":"","name_color":"8847ff"},{"name":"Sticker | Dead Eye (Holo)","icon":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJai0ki7VeTHjMWxCmme9UJ88IK77VbgRhH0jano8i5Uofb-O6dvJKnEWTLIl7kk4bY-HyrgwEVy5Gjdz9uod32fZlcgC5B0EOQU8k7vdW52fys","icon_small":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJai0ki7VeTHjMWxCmme9UJ88IK77VbgRhH0jano8i5Uofb-O6dvJKnEWTLIl7kk4bY-HyrgwEVy5Gjdz9uod32fZlcgC5B0EOQU8k7vdW52fys","rarity":"Remarkable","rarity_color":"8847ff","type":"Sticker","weapon":"","exterior":"","name_color":"8847ff"},{"name":"Sticker | Green Shark Shooter","icon":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJai0ki7VeTHjNioJW-e4VNK55Lm7ErvTg2-k5nu7jZe_c2vY5s9cb6RWDTGmOhz47k_TXHqw04l6zzdnIn9JHPCPAEiDsd2RrML4BjqkIblKaq8sHyskr9q","icon_small":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJai0ki7VeTHjNioJW-e4VNK55Lm7ErvTg2-k5nu7jZe_c2vY5s9cb6RWDTGmOhz47k_TXHqw04l6zzdnIn9JHPCPAEiDsd2RrML4BjqkIblKaq8sHyskr9q","rarity":"High Grade","rarity_color":"4b69ff","type":"Sticker","weapon":"","exterior":"","name_color":"4b69ff"},{"name":"Sir Bloody Darryl Royale | The Professionals","icon":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIa-2lmxU-LR0dnuNm6E8Vl45Iv181z1fgn8oYby8iRe_OGnZ6psLM-FD3WWkqAg6ec5THznk05-4jvXntz7JHjBOwYkDZAhQrZfskXuw9HiN-m3tAfclcsbmmRuIYiQ","icon_small":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIa-2lmxU-LR0dnuNm6E8Vl45Iv181z1fgn8oYby8iRe_OGnZ6psLM-FD3WWkqAg6ec5THznk05-4jvXntz7JHjBOwYkDZAhQrZfskXuw9HiN-m3tAfclcsbmmRuIYiQ","rarity":"Master","rarity_color":"eb4b4b","type":"Agent","weapon":"","exterior":"","name_color":"eb4b4b"},{"name":"AWP | Mortis (Field-Tested)","icon":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIGz3UqlXOLrxM-vMGmW8VNxu5Dx60noTyLwiYbf-jFk7uW-V6BoIeSbMWqVxedjva9rTSrjkRx14zmEyNehIyqQPFIjD8EhTbUKthLtxNPjNb7j71CMjY5G02yg2Rn_XBtf","icon_small":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIGz3UqlXOLrxM-vMGmW8VNxu5Dx60noTyLwiYbf-jFk7uW-V6BoIeSbMWqVxedjva9rTSrjkRx14zmEyNehIyqQPFIjD8EhTbUKthLtxNPjNb7j71CMjY5G02yg2Rn_XBtf","rarity":"Classified","rarity_color":"d32ce6","type":"Sniper Rifle","weapon":"AWP","exterior":"Field-Tested","name_color":"d32ce6"},{"name":"FAMAS | Commemoration (Factory New)","icon":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIGz3UqlXOLrxM-vMGmW8VNxu5Dx60noTyL3n5vh7h1c_M2oaalsM8-fC2CRwvdJt-5lSxa_nBovp3PUztn4d3qSPQ8kDMR5ROVb4xCxw9a0NLni4lCIio4QzXn32yMb6Sds_a9cBr1TwPEt","icon_small":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIGz3UqlXOLrxM-vMGmW8VNxu5Dx60noTyL3n5vh7h1c_M2oaalsM8-fC2CRwvdJt-5lSxa_nBovp3PUztn4d3qSPQ8kDMR5ROVb4xCxw9a0NLni4lCIio4QzXn32yMb6Sds_a9cBr1TwPEt","rarity":"Covert","rarity_color":"eb4b4b","type":"Rifle","weapon":"FAMAS","exterior":"Factory New","name_color":"eb4b4b"},{"name":"Sticker | Watermelon Tier6 (Holo)","icon":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJai0ki7VeTHjNioJW-e4VNK55Lm7ErvTg2-ip_l73Rkv6DgPKZsdaGXXmPJw-0gtrg6TnrjzU524W3Snt2hInOebwYnDJUkROUL4A74zIOtNt9oUw","icon_small":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJai0ki7VeTHjNioJW-e4VNK55Lm7ErvTg2-ip_l73Rkv6DgPKZsdaGXXmPJw-0gtrg6TnrjzU524W3Snt2hInOebwYnDJUkROUL4A74zIOtNt9oUw","rarity":"Remarkable","rarity_color":"8847ff","type":"Sticker","weapon":"","exterior":"","name_color":"8847ff"},{"name":"Diamond Operation Riptide Coin","icon":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJai2l-lQ8ndwMWvJjSY9VNn9ZP95VfYEEzOjprh6StV-v_gP6Y9eabLWmKRlLom6eAwSn3jwElx6jmAzNuodX-QbQR1DZIiQuUNtA74zIOo-DDEGw","icon_small":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJai2l-lQ8ndwMWvJjSY9VNn9ZP95VfYEEzOjprh6StV-v_gP6Y9eabLWmKRlLom6eAwSn3jwElx6jmAzNuodX-QbQR1DZIiQuUNtA74zIOo-DDEGw","rarity":"Extraordinary","rarity_color":"eb4b4b","type":"Collectible","weapon":"","exterior":"","name_color":"eb4b4b"},{"name":"Stockholm 2021 Finalists Autograph Capsule","icon":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJKz2lu_XsnXwtmkJjSU91dh8bjn_lDkShjjoYbh_ilk_Oaha69lcqDBX1iX0-FjoN5vRieymRQ0py7Ln9f4IymUbw4gWJIhReYNthjrkdbmNuvmsQOKjYJDyn75jSJPuy9p6vFCD_TstBROEw","icon_small":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJKz2lu_XsnXwtmkJjSU91dh8bjn_lDkShjjoYbh_ilk_Oaha69lcqDBX1iX0-FjoN5vRieymRQ0py7Ln9f4IymUbw4gWJIhReYNthjrkdbmNuvmsQOKjYJDyn75jSJPuy9p6vFCD_TstBROEw","rarity":"Base Grade","rarity_color":"b0c3d9","type":"Container","weapon":"","exterior":"","name_color":"b0c3d9"},{"name":"Stockholm 2021 Champions Autograph Capsule","icon":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJKz2lu_XsnXwtmkJjSU91dh8bjn_lDkShjjoYbh_ilk_Oaha69lcqDBX1iX0-FjoN5qRyi-hRQovS7LyIyqeS2QbgUnCcBzQ7JesBjulofiMrjh71eLg9hEnH_-hi9Ivyk6tvFCD_TIPI341g","icon_small":"https://community.fastly.steamstatic.com/economy/image/i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJKz2lu_XsnXwtmkJjSU91dh8bjn_lDkShjjoYbh_ilk_Oaha69lcqDBX1iX0-FjoN5qRyi-hRQovS7LyIyqeS2QbgUnCcBzQ7JesBjulofiMrjh71eLg9hEnH_-hi9Ivyk6tvFCD_TIPI341g","rarity":"Base Grade","rarity_color":"b0c3d9","type":"Container","weapon":"","exterior":"","name_color":"b0c3d9"}];
+
+const CACHE_KEY = 'cs2_portfolio_prices';
+const CACHE_TS_KEY = 'cs2_portfolio_prices_ts';
+const FETCH_DELAY = 3000; // 3 seconds between requests
+
+// Category colors
+const CAT_COLORS = {
+    'Knife': '#eb4b4b',
+    'Gloves': '#d32ce6',
+    'Rifle': '#cf6a32',
+    'Pistol': '#4b69ff',
+    'SMG': '#5e98d9',
+    'Sniper Rifle': '#8847ff',
+    'Shotgun': '#b0c3d9',
+    'Container': '#6b7785',
+    'Collectible': '#FFD700',
+    'Sticker': '#d32ce6',
+    'Agent': '#eb4b4b',
+    'Music Kit': '#4b69ff',
+    'Charm': '#8847ff',
+    'Graffiti': '#5e98d9',
+    'Patch': '#4b69ff'
+};
+
+// Category display order
+const CAT_ORDER = ['Knife','Gloves','Rifle','Sniper Rifle','Pistol','SMG','Shotgun','Sticker','Agent','Charm','Music Kit','Container','Collectible','Graffiti','Patch'];
+
+let prices = {};
+let currentFilter = 'All';
+let currentSort = 'price';
+let sortDir = -1; // -1 = desc
+let fetchAbort = null;
+
+// Load cached prices
+function loadCache() {
+    try {
+        const cached = localStorage.getItem(CACHE_KEY);
+        const ts = localStorage.getItem(CACHE_TS_KEY);
+        if (cached) {
+            prices = JSON.parse(cached);
+            if (ts) {
+                const d = new Date(parseInt(ts));
+                document.getElementById('lastUpdated').textContent = 'Prices cached: ' + d.toLocaleString();
+            }
+            return true;
+        }
+    } catch(e) {}
+    return false;
+}
+
+function saveCache() {
+    try {
+        localStorage.setItem(CACHE_KEY, JSON.stringify(prices));
+        localStorage.setItem(CACHE_TS_KEY, Date.now().toString());
+    } catch(e) {}
+}
+
+// Render everything
+function init() {
+    const hasCache = loadCache();
+    buildFilters();
+    renderTable();
+    updateSummary();
+    updateCategories();
+
+    if (!hasCache) {
+        fetchAllPrices();
+    } else {
+        // Check if we're missing any items
+        const missing = INVENTORY.filter(item => !(item.name in prices));
+        if (missing.length > 0) {
+            fetchAllPrices(missing);
+        }
+    }
+}
+
+// Build filter buttons
+function buildFilters() {
+    const types = new Set(INVENTORY.map(i => i.type));
+    const sortedTypes = CAT_ORDER.filter(t => types.has(t));
+    // Add any types not in our order
+    types.forEach(t => { if (!sortedTypes.includes(t)) sortedTypes.push(t); });
+
+    const container = document.getElementById('filterControls');
+    let html = '<button class="filter-btn active" data-filter="All">All</button>';
+    sortedTypes.forEach(type => {
+        const count = INVENTORY.filter(i => i.type === type).length;
+        html += '<button class="filter-btn" data-filter="' + type + '">' + type + ' (' + count + ')</button>';
+    });
+    html += '<select class="sort-select" id="sortSelect"><option value="price-desc">Price: High → Low</option><option value="price-asc">Price: Low → High</option><option value="name-asc">Name: A → Z</option><option value="name-desc">Name: Z → A</option><option value="type-asc">Type</option><option value="rarity-desc">Rarity</option></select>';
+    container.innerHTML = html;
+
+    container.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            container.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            currentFilter = btn.dataset.filter;
+            renderTable();
+        });
+    });
+
+    document.getElementById('sortSelect').addEventListener('change', (e) => {
+        const [field, dir] = e.target.value.split('-');
+        currentSort = field;
+        sortDir = dir === 'desc' ? -1 : 1;
+        renderTable();
+        updateSortHeaders();
+    });
+}
+
+// Rarity sort order
+const RARITY_ORDER = {
+    'Consumer Grade': 0, 'Base Grade': 1, 'Industrial Grade': 2,
+    'Mil-Spec Grade': 3, 'High Grade': 3, 'Exceptional': 4,
+    'Restricted': 4, 'Remarkable': 4,
+    'Classified': 5, 'Exotic': 5, 'Superior': 5,
+    'Covert': 6, 'Extraordinary': 6, 'Master': 7
+};
+
+function getFilteredSorted() {
+    let items = currentFilter === 'All' ? [...INVENTORY] : INVENTORY.filter(i => i.type === currentFilter);
+
+    items.sort((a, b) => {
+        if (currentSort === 'price') {
+            const pa = getPrice(a.name);
+            const pb = getPrice(b.name);
+            if (pa === null && pb === null) return 0;
+            if (pa === null) return 1;
+            if (pb === null) return -1;
+            return (pa - pb) * sortDir;
+        }
+        if (currentSort === 'name') {
+            return a.name.localeCompare(b.name) * sortDir;
+        }
+        if (currentSort === 'type') {
+            return a.type.localeCompare(b.type) * sortDir;
+        }
+        if (currentSort === 'rarity') {
+            const ra = RARITY_ORDER[a.rarity] || 0;
+            const rb = RARITY_ORDER[b.rarity] || 0;
+            return (rb - ra) * (sortDir === -1 ? 1 : -1);
+        }
+        return 0;
+    });
+    return items;
+}
+
+function getPrice(name) {
+    if (prices[name] && prices[name].price !== null && prices[name].price !== undefined) {
+        return prices[name].price;
+    }
+    return null;
+}
+
+function formatPrice(val) {
+    if (val === null || val === undefined) return null;
+    return '$' + val.toFixed(2);
+}
+
+function renderTable() {
+    const items = getFilteredSorted();
+    const tbody = document.getElementById('itemTableBody');
+    let html = '';
+
+    items.forEach(item => {
+        const p = getPrice(item.name);
+        const priceStr = p !== null ? formatPrice(p) : (prices[item.name] && prices[item.name].na ? 'N/A' : '...');
+        const priceClass = p !== null ? '' : (prices[item.name] && prices[item.name].na ? 'na' : 'loading loading-pulse');
+
+        html += '<tr>' +
+            '<td><img class="item-img" src="' + item.icon_small + '" alt="" loading="lazy"></td>' +
+            '<td><span class="item-name" style="color:#' + item.rarity_color + '">' + escapeHtml(item.name) + '</span></td>' +
+            '<td class="hide-mobile">' + item.type + '</td>' +
+            '<td class="hide-mobile"><span class="item-rarity" style="background:rgba(' + hexToRgb(item.rarity_color) + ',0.15);color:#' + item.rarity_color + '">' + item.rarity + '</span></td>' +
+            '<td class="hide-mobile">' + (item.exterior || '—') + '</td>' +
+            '<td><span class="item-price ' + priceClass + '">' + priceStr + '</span></td>' +
+            '</tr>';
+    });
+
+    tbody.innerHTML = html;
+}
+
+function updateSortHeaders() {
+    document.querySelectorAll('.item-table thead th').forEach(th => {
+        th.classList.remove('sorted');
+        th.querySelector('.sort-arrow').textContent = '';
+    });
+}
+
+function updateSummary() {
+    let total = 0;
+    let priced = 0;
+
+    INVENTORY.forEach(item => {
+        const p = getPrice(item.name);
+        if (p !== null) {
+            total += p;
+            priced++;
+        }
+    });
+
+    const totalEl = document.getElementById('totalValue');
+    const subEl = document.getElementById('totalValueSub');
+
+    if (priced > 0) {
+        totalEl.textContent = '$' + total.toFixed(2);
+        subEl.textContent = priced + ' of ' + INVENTORY.length + ' items priced';
+    } else {
+        totalEl.textContent = '---';
+        subEl.textContent = 'loading prices...';
+    }
+}
+
+function updateCategories() {
+    const catData = {};
+    let totalVal = 0;
+
+    INVENTORY.forEach(item => {
+        const cat = item.type;
+        if (!catData[cat]) catData[cat] = { count: 0, value: 0, priced: 0 };
+        catData[cat].count++;
+        const p = getPrice(item.name);
+        if (p !== null) {
+            catData[cat].value += p;
+            catData[cat].priced++;
+            totalVal += p;
+        }
+    });
+
+    // Find most valuable category
+    let maxCat = '';
+    let maxVal = 0;
+    Object.entries(catData).forEach(([cat, data]) => {
+        if (data.value > maxVal) { maxVal = data.value; maxCat = cat; }
+    });
+
+    if (maxCat) {
+        document.getElementById('mostValuable').textContent = maxCat;
+        document.getElementById('mostValuableSub').textContent = '$' + maxVal.toFixed(2);
+    }
+
+    // Sort by value
+    const sorted = Object.entries(catData).sort((a, b) => b[1].value - a[1].value);
+    const maxBarVal = sorted.length > 0 ? sorted[0][1].value : 1;
+
+    const container = document.getElementById('categoryBars');
+    if (totalVal === 0) {
+        container.innerHTML = '<p style="color: var(--text-muted); font-style: italic;" class="loading-pulse">Waiting for prices...</p>';
+        return;
+    }
+
+    let html = '';
+    sorted.forEach(([cat, data]) => {
+        const pct = totalVal > 0 ? (data.value / totalVal * 100) : 0;
+        const barWidth = maxBarVal > 0 ? (data.value / maxBarVal * 100) : 0;
+        const color = CAT_COLORS[cat] || '#888';
+
+        html += '<div class="category-row">' +
+            '<span class="category-name">' + cat + ' (' + data.count + ')</span>' +
+            '<div class="category-bar-track"><div class="category-bar-fill" style="width:' + Math.max(barWidth, 2) + '%;background:' + color + '">' + (barWidth > 15 ? data.count + ' items' : '') + '</div></div>' +
+            '<span class="category-value">' + formatPrice(data.value) + '</span>' +
+            '<span class="category-pct">' + pct.toFixed(1) + '%</span>' +
+            '</div>';
+    });
+
+    container.innerHTML = html;
+}
+
+// Fetch prices from Steam
+async function fetchAllPrices(itemsToFetch) {
+    const items = itemsToFetch || INVENTORY;
+    // Filter to items that could have market prices (skip items we already know are N/A)
+    const marketable = items.filter(item => {
+        // Skip items we already have prices for (unless refreshing)
+        if (!itemsToFetch && prices[item.name] && (prices[item.name].price !== undefined || prices[item.name].na)) return false;
+        return true;
+    });
+
+    if (marketable.length === 0) return;
+
+    const progressContainer = document.getElementById('progressContainer');
+    const progressBar = document.getElementById('progressBar');
+    const progressText = document.getElementById('progressText');
+    const progressCount = document.getElementById('progressCount');
+    progressContainer.classList.add('active');
+
+    let completed = 0;
+    let errors = 0;
+
+    for (const item of marketable) {
+        completed++;
+        progressCount.textContent = completed + ' / ' + marketable.length;
+        progressBar.style.width = (completed / marketable.length * 100) + '%';
+        progressText.textContent = 'Fetching: ' + item.name.substring(0, 50) + (item.name.length > 50 ? '...' : '');
+
+        try {
+            const encodedName = encodeURIComponent(item.name);
+            const url = 'https://steamcommunity.com/market/priceoverview/?appid=730&currency=1&market_hash_name=' + encodedName;
+
+            const response = await fetch(url);
+
+            if (response.status === 429) {
+                // Rate limited, wait longer
+                progressText.textContent = 'Rate limited, waiting 10s...';
+                await sleep(10000);
+                completed--;
+                continue;
+            }
+
+            if (!response.ok) {
+                prices[item.name] = { na: true };
+                continue;
+            }
+
+            const data = await response.json();
+
+            if (data.success && data.lowest_price) {
+                const priceStr = data.lowest_price.replace('$', '').replace(',', '');
+                const priceVal = parseFloat(priceStr);
+                if (!isNaN(priceVal)) {
+                    prices[item.name] = { price: priceVal, median: data.median_price || null };
+                } else {
+                    prices[item.name] = { na: true };
+                }
+            } else {
+                prices[item.name] = { na: true };
+            }
+        } catch (e) {
+            errors++;
+            prices[item.name] = { na: true };
+        }
+
+        // Update UI periodically
+        if (completed % 3 === 0 || completed === marketable.length) {
+            saveCache();
+            renderTable();
+            updateSummary();
+            updateCategories();
+            const now = new Date();
+            document.getElementById('lastUpdated').textContent = 'Prices updated: ' + now.toLocaleString();
+        }
+
+        if (completed < marketable.length) {
+            await sleep(FETCH_DELAY);
+        }
+    }
+
+    progressText.textContent = 'Done! ' + (errors > 0 ? errors + ' items unavailable.' : 'All prices loaded.');
+    progressBar.style.width = '100%';
+    saveCache();
+    renderTable();
+    updateSummary();
+    updateCategories();
+
+    setTimeout(() => { progressContainer.classList.remove('active'); }, 3000);
+}
+
+// Refresh button
+document.getElementById('refreshBtn').addEventListener('click', () => {
+    prices = {};
+    try { localStorage.removeItem(CACHE_KEY); localStorage.removeItem(CACHE_TS_KEY); } catch(e) {}
+    renderTable();
+    updateSummary();
+    updateCategories();
+    fetchAllPrices();
+});
+
+// Column header sort
+document.querySelectorAll('.item-table thead th[data-sort]').forEach(th => {
+    th.addEventListener('click', () => {
+        const field = th.dataset.sort;
+        if (currentSort === field) {
+            sortDir *= -1;
+        } else {
+            currentSort = field;
+            sortDir = field === 'price' ? -1 : 1;
+        }
+        // Update select to match
+        const select = document.getElementById('sortSelect');
+        const val = field + '-' + (sortDir === -1 ? 'desc' : 'asc');
+        for (let opt of select.options) {
+            if (opt.value === val) { select.value = val; break; }
+        }
+        // Update arrows
+        document.querySelectorAll('.item-table thead th').forEach(h => {
+            h.classList.remove('sorted');
+            const arrow = h.querySelector('.sort-arrow');
+            if (arrow) arrow.textContent = '';
+        });
+        th.classList.add('sorted');
+        const arrow = th.querySelector('.sort-arrow');
+        if (arrow) arrow.textContent = sortDir === -1 ? '▼' : '▲';
+
+        renderTable();
+    });
+});
+
+// Helpers
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+function escapeHtml(str) {
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+}
+
+function hexToRgb(hex) {
+    hex = hex.replace('#', '');
+    const r = parseInt(hex.substring(0, 2), 16);
+    const g = parseInt(hex.substring(2, 4), 16);
+    const b = parseInt(hex.substring(4, 6), 16);
+    return r + ',' + g + ',' + b;
+}
+
+// Go!
+init();
+</script>
+</body>
+</html>
