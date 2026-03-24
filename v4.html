@@ -1,0 +1,1403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SHROUB | CS2 Collection Showcase</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            /* CS2 Rarity Colors */
+            --consumer: #b0c3d9;
+            --industrial: #5e98d9;
+            --mil-spec: #4b69ff;
+            --restricted: #8847ff;
+            --classified: #d32ce6;
+            --covert: #eb4b4b;
+            --extraordinary: #e4ae39;
+            --knife: #e4ae39;
+            
+            /* Gold Theme Colors */
+            --bg-primary: #0a0a0a;
+            --bg-secondary: #111111;
+            --bg-card: rgba(17, 17, 17, 0.8);
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0a0;
+            --accent: #FFD700;
+            --accent-secondary: #C9A84C;
+            --gold-light: #FFF8DC;
+            --gold-dark: #B8860B;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #0a0a0a !important;
+            color: #ffffff !important;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        .orbitron {
+            font-family: 'Orbitron', monospace;
+        }
+
+        /* Enhanced Cinematic Background with Noise Texture */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(255, 215, 0, 0.03) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(196, 168, 76, 0.02) 0%, transparent 50%),
+                radial-gradient(circle at 40% 80%, rgba(255, 215, 0, 0.01) 0%, transparent 50%),
+                linear-gradient(45deg, #0a0a0a 0%, #1a0f1a 25%, #0f0a1a 50%, #1a1a0a 75%, #0a0a0a 100%),
+                url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.02'/%3E%3C/svg%3E");
+            background-size: 400% 400%, 100% 100%;
+            animation: morphBackground 20s ease-in-out infinite;
+            z-index: -1;
+        }
+
+        @keyframes morphBackground {
+            0%, 100% { background-position: 0% 50%, 0 0; }
+            50% { background-position: 100% 50%, 0 0; }
+        }
+
+        /* Cinematic Scroll Progress Bar */
+        .scroll-progress {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 0%;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent), var(--accent-secondary), var(--gold-light));
+            z-index: 1000;
+            transition: width 0.1s ease;
+            box-shadow: 0 0 20px var(--accent), 0 0 40px rgba(255, 215, 0, 0.3);
+        }
+
+        /* Particle Canvas */
+        #particleCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none !important;
+            z-index: 1;
+        }
+
+        /* Enhanced Gold Gradient Text with Glow */
+        .gold-gradient {
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-secondary) 50%, var(--gold-light) 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            position: relative;
+            text-shadow: 0 0 30px rgba(255, 215, 0, 0.3);
+        }
+
+        /* Cinematic Hero Title with Multiple Effects */
+        .hero-title {
+            position: relative;
+            overflow: hidden;
+            text-shadow: 
+                0 0 30px rgba(255, 215, 0, 0.8),
+                0 0 60px rgba(255, 215, 0, 0.4),
+                0 0 90px rgba(255, 215, 0, 0.2);
+            filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.5));
+        }
+
+        .hero-title::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.6), transparent);
+            animation: heroShine 4s ease-in-out infinite;
+        }
+
+        @keyframes heroShine {
+            0% { left: -100%; }
+            50% { left: 100%; }
+            100% { left: 100%; }
+        }
+
+        /* Enhanced Gold Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-primary);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(to bottom, var(--accent), var(--accent-secondary));
+            border-radius: 4px;
+            box-shadow: 0 0 10px var(--accent);
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(to bottom, var(--gold-light), var(--gold-dark));
+            box-shadow: 0 0 15px var(--accent);
+        }
+
+        /* Premium Frosted Glass Morphism */
+        .glass {
+            background: rgba(17, 17, 17, 0.4);
+            backdrop-filter: blur(30px) saturate(120%);
+            border: 1px solid rgba(255, 215, 0, 0.15);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .glass-card {
+            background: rgba(17, 17, 17, 0.6);
+            backdrop-filter: blur(20px) saturate(110%);
+            border: 1px solid rgba(255, 215, 0, 0.1);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .glass-card:hover {
+            background: rgba(17, 17, 17, 0.8);
+            backdrop-filter: blur(25px) saturate(130%);
+            border-color: rgba(255, 215, 0, 0.4);
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(255, 215, 0, 0.15), 0 8px 25px rgba(0, 0, 0, 0.4);
+        }
+
+        /* Cinematic Item Cards with Multiple Effects */
+        .item-card {
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1);
+            transform-style: preserve-3d;
+            perspective: 1000px;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        /* 3D Perspective Tilt Following Cursor */
+        .item-card.tilt-active {
+            transition: transform 0.1s ease-out;
+        }
+
+        /* Holographic Prismatic Light Reflection */
+        .item-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, 
+                transparent 30%, 
+                rgba(255, 215, 0, 0.1) 40%,
+                rgba(196, 168, 76, 0.2) 50%,
+                rgba(255, 215, 0, 0.1) 60%,
+                transparent 70%);
+            background-size: 200% 200%;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        .item-card:hover::before {
+            opacity: 1;
+            animation: holographicSweep 2s ease-in-out infinite;
+        }
+
+        @keyframes holographicSweep {
+            0% { background-position: -100% -100%; }
+            50% { background-position: 100% 100%; }
+            100% { background-position: -100% -100%; }
+        }
+
+        /* Ambient Glow with Rarity Colors */
+        .item-card::after {
+            content: '';
+            position: absolute;
+            inset: -2px;
+            background: linear-gradient(45deg, 
+                transparent, 
+                var(--rarity-color, var(--accent)), 
+                transparent);
+            border-radius: inherit;
+            z-index: -1;
+            opacity: 0;
+            filter: blur(10px);
+            transition: opacity 0.3s ease;
+            animation: ambientPulse 3s ease-in-out infinite;
+        }
+
+        .item-card:hover::after {
+            opacity: 0.6;
+        }
+
+        @keyframes ambientPulse {
+            0%, 100% { opacity: 0.2; }
+            50% { opacity: 0.4; }
+        }
+
+        /* Enhanced Item Card Hover */
+        .item-card:hover {
+            transform: translateY(-12px) scale(1.03);
+            border-color: var(--rarity-color, var(--accent));
+            box-shadow: 
+                0 25px 50px rgba(0, 0, 0, 0.3),
+                0 0 30px var(--rarity-color, var(--accent));
+        }
+
+        /* Subtle Parallax on Skin Image */
+        .item-card img {
+            transition: transform 0.3s ease;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .item-card:hover img {
+            transform: scale(1.1) translate(-2px, -2px);
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-5px); }
+        }
+
+        /* Card Reveal Animation */
+        .item-card {
+            opacity: 0;
+            transform: translateY(40px) scale(0.9);
+            filter: blur(5px);
+            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .item-card.visible {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+            filter: blur(0px);
+        }
+
+        /* Enhanced Stat Counter Animations */
+        .stat-counter {
+            opacity: 0;
+            transform: scale(0.3) translateY(40px) rotateY(90deg);
+            animation: statEnterCinematic 1s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
+        }
+
+        .stat-counter:nth-child(1) { animation-delay: 0.2s; }
+        .stat-counter:nth-child(2) { animation-delay: 0.4s; }
+        .stat-counter:nth-child(3) { animation-delay: 0.6s; }
+        .stat-counter:nth-child(4) { animation-delay: 0.8s; }
+
+        @keyframes statEnterCinematic {
+            0% {
+                opacity: 0;
+                transform: scale(0.3) translateY(40px) rotateY(90deg);
+            }
+            50% {
+                opacity: 0.8;
+                transform: scale(1.1) translateY(-10px) rotateY(0deg);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1) translateY(0) rotateY(0deg);
+            }
+        }
+
+        /* Cinematic Section Dividers */
+        .cinematic-divider {
+            height: 120px;
+            margin: 6rem 0;
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(135deg, 
+                rgba(10, 10, 10, 0.9) 0%,
+                rgba(255, 215, 0, 0.05) 25%,
+                rgba(196, 168, 76, 0.08) 50%,
+                rgba(255, 215, 0, 0.05) 75%,
+                rgba(10, 10, 10, 0.9) 100%);
+            clip-path: polygon(0 20%, 100% 0, 100% 80%, 0 100%);
+        }
+
+        .cinematic-divider::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 200%;
+            height: 100%;
+            background: linear-gradient(90deg, 
+                transparent,
+                rgba(255, 215, 0, 0.3),
+                rgba(196, 168, 76, 0.5),
+                rgba(255, 215, 0, 0.3),
+                transparent);
+            animation: dividerFlow 8s ease-in-out infinite;
+        }
+
+        @keyframes dividerFlow {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        /* Decorative Geometric SVG Elements */
+        .floating-geometric {
+            position: absolute;
+            opacity: 0.1;
+            animation: floatRotate 20s linear infinite;
+        }
+
+        .floating-geometric:nth-child(odd) {
+            animation-direction: reverse;
+            animation-duration: 25s;
+        }
+
+        @keyframes floatRotate {
+            0% { transform: rotate(0deg) scale(1); }
+            50% { transform: rotate(180deg) scale(1.2); }
+            100% { transform: rotate(360deg) scale(1); }
+        }
+
+        /* Enhanced Filter Buttons with Sliding Underline */
+        .filter-btn {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid rgba(255, 215, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .filter-btn::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--accent), var(--gold-light));
+            transition: width 0.3s ease;
+        }
+
+        .filter-btn.active::before {
+            width: 100%;
+        }
+
+        .filter-btn.active {
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-secondary) 100%);
+            border-color: var(--accent);
+            color: #000;
+            font-weight: 600;
+            box-shadow: 0 0 25px rgba(255, 215, 0, 0.6);
+            transform: translateY(-2px);
+        }
+
+        .filter-btn:hover:not(.active) {
+            background: rgba(255, 215, 0, 0.15);
+            border-color: rgba(255, 215, 0, 0.4);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(255, 215, 0, 0.2);
+        }
+
+        .filter-btn:hover:not(.active)::before {
+            width: 100%;
+        }
+
+        /* Enhanced Search Bar with Expanding Glow */
+        #searchInput {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            background: rgba(17, 17, 17, 0.4);
+            backdrop-filter: blur(20px);
+        }
+
+        #searchInput:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 
+                0 0 0 3px rgba(255, 215, 0, 0.2),
+                0 0 30px rgba(255, 215, 0, 0.3),
+                0 8px 25px rgba(0, 0, 0, 0.2);
+            background: rgba(17, 17, 17, 0.6);
+            transform: scale(1.02);
+        }
+
+        /* Enhanced Video Hover Effects */
+        .video-player {
+            background: #000;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+            border: 2px solid transparent;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+
+        .video-player:hover {
+            border-color: var(--accent);
+            box-shadow: 
+                0 25px 50px rgba(255, 215, 0, 0.2),
+                0 20px 40px rgba(0, 0, 0, 0.6);
+            transform: scale(1.02);
+        }
+
+        .video-player video {
+            transition: all 0.3s ease;
+        }
+
+        .video-player:hover video {
+            filter: brightness(1.1) contrast(1.05);
+        }
+
+        /* Enhanced Modal with Backdrop Blur */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(20px) saturate(120%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background: rgba(17, 17, 17, 0.95);
+            backdrop-filter: blur(30px) saturate(130%);
+            border: 2px solid var(--accent);
+            border-radius: 20px;
+            padding: 2.5rem;
+            max-width: 600px;
+            width: 90%;
+            transform: scale(0.5) rotate(5deg);
+            transition: transform 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            box-shadow: 
+                0 25px 50px rgba(0, 0, 0, 0.5),
+                0 0 40px rgba(255, 215, 0, 0.3);
+        }
+
+        .modal.active .modal-content {
+            transform: scale(1) rotate(0deg);
+        }
+
+        /* Large Skin Image with Ambient Glow */
+        .modal-image-container {
+            position: relative;
+            border-radius: 16px;
+            overflow: hidden;
+            background: rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-image-container::before {
+            content: '';
+            position: absolute;
+            inset: -10px;
+            background: linear-gradient(45deg, 
+                transparent,
+                var(--modal-rarity-color, var(--accent)),
+                transparent);
+            border-radius: 20px;
+            z-index: -1;
+            opacity: 0.6;
+            filter: blur(15px);
+            animation: ambientPulse 3s ease-in-out infinite;
+        }
+
+        /* Enhanced Chart Animations */
+        .chart-bar {
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            transform-origin: bottom;
+            position: relative;
+            border-radius: 6px;
+        }
+
+        .chart-bar:hover {
+            transform: scaleY(1.1) scaleX(1.02);
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.6);
+        }
+
+        .chart-bar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transform: translateX(-100%);
+            transition: transform 0.8s ease;
+            border-radius: inherit;
+        }
+
+        .chart-bar:hover::after {
+            transform: translateX(100%);
+        }
+
+        /* Scroll-triggered animations */
+        .fade-in-up {
+            opacity: 0;
+            transform: translateY(60px);
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .fade-in-up.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .slide-in-left {
+            opacity: 0;
+            transform: translateX(-100px) scale(0.9);
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .slide-in-right {
+            opacity: 0;
+            transform: translateX(100px) scale(0.9);
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .slide-in-left.visible, .slide-in-right.visible {
+            opacity: 1;
+            transform: translateX(0) scale(1);
+        }
+
+        /* Loading Shimmer */
+        .shimmer {
+            background: linear-gradient(90deg, 
+                rgba(255, 215, 0, 0.05), 
+                rgba(255, 215, 0, 0.15), 
+                rgba(255, 215, 0, 0.05));
+            background-size: 200% 100%;
+            animation: shimmer-loading 2s infinite;
+        }
+
+        @keyframes shimmer-loading {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+
+        /* Responsive Grid */
+        .inventory-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        @media (max-width: 640px) {
+            .inventory-grid {
+                grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+                gap: 1.5rem;
+            }
+            
+            .cinematic-divider {
+                height: 80px;
+                margin: 4rem 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Scroll Progress Bar -->
+    <div class="scroll-progress"></div>
+
+    <!-- Navigation -->
+    <nav class="fixed top-0 left-0 right-0 z-50 glass border-b border-accent/20">
+        <div class="container mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <div class="orbitron text-xl font-bold gold-gradient">SHROUB</div>
+                <div class="flex space-x-6 text-sm">
+                    <a href="#hero" class="hover:text-accent transition-colors">Home</a>
+                    <a href="#inventory" class="hover:text-accent transition-colors">Inventory</a>
+                    <a href="#highlights" class="hover:text-accent transition-colors">Highlights</a>
+                    <a href="#stats" class="hover:text-accent transition-colors">Stats</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="hero" class="min-h-screen flex items-center justify-center relative overflow-hidden">
+        <!-- Particle Canvas -->
+        <canvas id="particleCanvas"></canvas>
+        
+        <!-- Decorative Geometric SVG Elements -->
+        <svg class="floating-geometric" style="top: 10%; left: 10%; width: 80px; height: 80px;" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="50" cy="50" r="30" stroke="#FFD700" stroke-width="2"/>
+            <line x1="20" y1="50" x2="80" y2="50" stroke="#C9A84C" stroke-width="1"/>
+            <line x1="50" y1="20" x2="50" y2="80" stroke="#C9A84C" stroke-width="1"/>
+        </svg>
+        
+        <svg class="floating-geometric" style="top: 20%; right: 15%; width: 120px; height: 120px;" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <polygon points="50,10 90,90 10,90" stroke="#FFD700" stroke-width="1.5" fill="rgba(255,215,0,0.05)"/>
+            <circle cx="50" cy="60" r="8" fill="#C9A84C"/>
+        </svg>
+        
+        <svg class="floating-geometric" style="bottom: 20%; left: 15%; width: 100px; height: 100px;" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="25" y="25" width="50" height="50" stroke="#FFD700" stroke-width="2" fill="none" transform="rotate(45 50 50)"/>
+            <circle cx="50" cy="50" r="15" stroke="#C9A84C" stroke-width="1"/>
+        </svg>
+        
+        <div class="absolute inset-0">
+            <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-accent/10 rounded-full blur-3xl"></div>
+            <div class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-accent-secondary/10 rounded-full blur-3xl"></div>
+        </div>
+        
+        <div class="container mx-auto px-6 text-center relative z-10">
+            <div class="fade-in-up">
+                <h1 class="hero-title orbitron text-6xl md:text-8xl font-black mb-6 gold-gradient">
+                    SHROUB
+                </h1>
+                <p class="text-xl md:text-2xl text-text-secondary mb-12 max-w-2xl mx-auto">
+                    A curated collection of premium CS2 skins, representing years of passion for the game and its artistry.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto fade-in-up">
+                <div class="glass-card p-6 rounded-xl stat-counter">
+                    <div class="orbitron text-3xl font-bold gold-gradient counter" data-target="105">0</div>
+                    <div class="text-text-secondary text-sm mt-2">Total Items</div>
+                </div>
+                <div class="glass-card p-6 rounded-xl stat-counter">
+                    <div class="orbitron text-3xl font-bold gold-gradient counter" data-target="12500">0</div>
+                    <div class="text-text-secondary text-sm mt-2">Est. Value ($)</div>
+                </div>
+                <div class="glass-card p-6 rounded-xl stat-counter">
+                    <div class="orbitron text-3xl font-bold gold-gradient counter" data-target="8">0</div>
+                    <div class="text-text-secondary text-sm mt-2">Rare Items</div>
+                </div>
+                <div class="glass-card p-6 rounded-xl stat-counter">
+                    <div class="orbitron text-3xl font-bold gold-gradient counter" data-target="3">0</div>
+                    <div class="text-text-secondary text-sm mt-2">Years Collecting</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Cinematic Divider -->
+    <div class="cinematic-divider"></div>
+
+    <!-- Inventory Section -->
+    <section id="inventory" class="py-20 relative">
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-12 slide-in-left">
+                <h2 class="orbitron text-4xl md:text-5xl font-bold mb-4 gold-gradient">The Collection</h2>
+                <p class="text-text-secondary text-lg max-w-2xl mx-auto">
+                    Each item carefully selected for its rarity, design, and significance in the Counter-Strike universe.
+                </p>
+            </div>
+
+            <!-- Filters -->
+            <div class="mb-8 fade-in-up">
+                <div class="flex flex-wrap justify-center gap-3 mb-6">
+                    <button class="filter-btn active px-4 py-2 rounded-lg text-sm" data-filter="all">All Items</button>
+                    <button class="filter-btn px-4 py-2 rounded-lg text-sm" data-filter="Rifle">Rifles</button>
+                    <button class="filter-btn px-4 py-2 rounded-lg text-sm" data-filter="Pistol">Pistols</button>
+                    <button class="filter-btn px-4 py-2 rounded-lg text-sm" data-filter="SMG">SMGs</button>
+                    <button class="filter-btn px-4 py-2 rounded-lg text-sm" data-filter="Knife">Knives</button>
+                    <button class="filter-btn px-4 py-2 rounded-lg text-sm" data-filter="Gloves">Gloves</button>
+                    <button class="filter-btn px-4 py-2 rounded-lg text-sm" data-filter="Sticker">Stickers</button>
+                    <button class="filter-btn px-4 py-2 rounded-lg text-sm" data-filter="Agent">Agents</button>
+                </div>
+
+                <div class="flex flex-wrap justify-center gap-2">
+                    <button class="filter-btn px-3 py-1 rounded-md text-xs" data-rarity="all">All Rarities</button>
+                    <button class="filter-btn px-3 py-1 rounded-md text-xs" data-rarity="Covert" style="--rarity-color: #eb4b4b;">Covert</button>
+                    <button class="filter-btn px-3 py-1 rounded-md text-xs" data-rarity="Classified" style="--rarity-color: #d32ce6;">Classified</button>
+                    <button class="filter-btn px-3 py-1 rounded-md text-xs" data-rarity="Restricted" style="--rarity-color: #8847ff;">Restricted</button>
+                    <button class="filter-btn px-3 py-1 rounded-md text-xs" data-rarity="Extraordinary" style="--rarity-color: #e4ae39;">Extraordinary</button>
+                </div>
+            </div>
+
+            <!-- Search -->
+            <div class="max-w-md mx-auto mb-8 fade-in-up">
+                <input type="text" id="searchInput" placeholder="Search items..." 
+                       class="w-full px-6 py-4 rounded-lg focus:outline-none transition-all">
+            </div>
+
+            <!-- Loading State -->
+            <div id="loadingState" class="inventory-grid">
+                <div class="glass-card p-4 rounded-xl shimmer h-96"></div>
+                <div class="glass-card p-4 rounded-xl shimmer h-96"></div>
+                <div class="glass-card p-4 rounded-xl shimmer h-96"></div>
+                <div class="glass-card p-4 rounded-xl shimmer h-96"></div>
+            </div>
+
+            <!-- Inventory Grid -->
+            <div id="inventoryGrid" class="inventory-grid fade-in-up" style="display: none;">
+                <!-- Items will be dynamically loaded here -->
+            </div>
+
+            <!-- No Results -->
+            <div id="noResults" class="text-center py-20 hidden">
+                <div class="text-6xl mb-4">🔍</div>
+                <h3 class="text-xl font-semibold mb-2">No items found</h3>
+                <p class="text-text-secondary">Try adjusting your filters or search terms</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Cinematic Divider -->
+    <div class="cinematic-divider"></div>
+
+    <!-- Highlights Section -->
+    <section id="highlights" class="py-20 bg-black/20">
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-12 slide-in-right">
+                <h2 class="orbitron text-4xl md:text-5xl font-bold mb-4 gold-gradient">Epic Moments</h2>
+                <p class="text-text-secondary text-lg max-w-2xl mx-auto">
+                    Watch the plays that define skill, strategy, and pure adrenaline in Counter-Strike.
+                </p>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-8 max-w-6xl mx-auto">
+                <div class="fade-in-up">
+                    <div class="video-player">
+                        <video controls class="w-full aspect-video" poster="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1920 1080'%3E%3Crect fill='%23000' width='1920' height='1080'/%3E%3Ctext x='960' y='540' text-anchor='middle' fill='%23FFD700' font-family='monospace' font-size='48'%3E1v4 CLUTCH%3C/text%3E%3C/svg%3E">
+                            <source src="../cs2-content/1v4_clutch_short_compressed.mp4" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    </div>
+                    <div class="mt-4">
+                        <h3 class="text-xl font-semibold mb-2 gold-gradient">Legendary 1v4 Clutch</h3>
+                        <p class="text-text-secondary text-sm">An incredible display of skill and nerves under pressure. Watch as SHROUB turns an impossible situation into victory.</p>
+                    </div>
+                </div>
+
+                <div class="fade-in-up">
+                    <div class="video-player">
+                        <video controls class="w-full aspect-video" poster="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1920 1080'%3E%3Crect fill='%23000' width='1920' height='1080'/%3E%3Ctext x='960' y='540' text-anchor='middle' fill='%23C9A84C' font-family='monospace' font-size='48'%3EACE SPRAYDOWN%3C/text%3E%3C/svg%3E">
+                            <source src="../cs2-content/ace_spraydown.mp4" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    </div>
+                    <div class="mt-4">
+                        <h3 class="text-xl font-semibold mb-2 gold-gradient">Perfect Ace Spraydown</h3>
+                        <p class="text-text-secondary text-sm">Flawless recoil control and positioning lead to a devastating ace. Pure mechanical skill on display.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Cinematic Divider -->
+    <div class="cinematic-divider"></div>
+
+    <!-- Stats Section -->
+    <section id="stats" class="py-20">
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-12 slide-in-left">
+                <h2 class="orbitron text-4xl md:text-5xl font-bold mb-4 gold-gradient">Collection Analytics</h2>
+                <p class="text-text-secondary text-lg max-w-2xl mx-auto">
+                    Deep dive into the composition and value distribution of this curated arsenal.
+                </p>
+            </div>
+
+            <div class="grid lg:grid-cols-2 gap-12 max-w-6xl mx-auto">
+                <!-- Rarity Distribution -->
+                <div class="glass-card p-8 rounded-xl fade-in-up">
+                    <h3 class="text-2xl font-semibold mb-6 orbitron gold-gradient">Rarity Breakdown</h3>
+                    <div id="rarityChart" class="space-y-4">
+                        <!-- Chart will be generated by JS -->
+                    </div>
+                </div>
+
+                <!-- Type Distribution -->
+                <div class="glass-card p-8 rounded-xl fade-in-up">
+                    <h3 class="text-2xl font-semibold mb-6 orbitron gold-gradient">Item Categories</h3>
+                    <div id="typeChart" class="space-y-4">
+                        <!-- Chart will be generated by JS -->
+                    </div>
+                </div>
+
+                <!-- Collection Timeline -->
+                <div class="glass-card p-8 rounded-xl fade-in-up lg:col-span-2">
+                    <h3 class="text-2xl font-semibold mb-6 orbitron gold-gradient">Collection Highlights</h3>
+                    <div class="grid md:grid-cols-3 gap-6">
+                        <div class="text-center">
+                            <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-accent to-accent-secondary flex items-center justify-center">
+                                <span class="text-2xl">🔪</span>
+                            </div>
+                            <h4 class="font-semibold mb-2 gold-gradient">Premium Knives</h4>
+                            <p class="text-text-secondary text-sm">M9 Bayonet Lore and other high-tier blades represent the pinnacle of CS2 collecting.</p>
+                        </div>
+                        <div class="text-center">
+                            <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-accent to-accent-secondary flex items-center justify-center">
+                                <span class="text-2xl">🧤</span>
+                            </div>
+                            <h4 class="font-semibold mb-2 gold-gradient">Rare Gloves</h4>
+                            <p class="text-text-secondary text-sm">Sport Gloves Omega in Minimal Wear condition - a true collector's piece.</p>
+                        </div>
+                        <div class="text-center">
+                            <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-accent to-accent-secondary flex items-center justify-center">
+                                <span class="text-2xl">🏆</span>
+                            </div>
+                            <h4 class="font-semibold mb-2 gold-gradient">Tournament Items</h4>
+                            <p class="text-text-secondary text-sm">Souvenir items and tournament stickers commemorate legendary CS2 moments.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-12 bg-black/50 border-t border-accent/20">
+        <div class="container mx-auto px-6 text-center">
+            <div class="orbitron text-2xl font-bold gold-gradient mb-4">SHROUB</div>
+            <p class="text-text-secondary mb-4">Passionate CS2 collector and player</p>
+            <div class="flex justify-center space-x-6 text-sm">
+                <span>Steam: SHROUB</span>
+                <span>•</span>
+                <span>Collection Value: $12,500+</span>
+                <span>•</span>
+                <span>Items: 105</span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Item Modal -->
+    <div id="itemModal" class="modal">
+        <div class="modal-content">
+            <div class="flex justify-between items-center mb-6">
+                <h3 id="modalTitle" class="text-2xl font-semibold gold-gradient"></h3>
+                <button id="closeModal" class="text-3xl hover:text-accent transition-colors">&times;</button>
+            </div>
+            <div class="modal-image-container aspect-square mb-6 rounded-lg flex items-center justify-center">
+                <img id="modalImage" src="" alt="" class="max-w-full max-h-full object-contain">
+            </div>
+            <div id="modalDetails" class="space-y-3">
+                <!-- Details will be populated by JS -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let inventoryData = [];
+        let filteredData = [];
+
+        // Fallback inventory data (first 5 items)
+        const fallbackData = [
+            {
+                "name": "AK-47 | Redline",
+                "icon": "https://steamcommunity-a.akamaihd.net/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvCo04DEVlxkKgpot7HxfDhjxszJemkV09-5lpKKqPrxN7LEmyUBtZIp07CX99z3iVWw8xY9ZG3xcISQJ1RrZFDTrlC-xui8hZK4tJzOn3A1vjdx4nfVnxDhnxlMPuBxxavJL8b5BDQR",
+                "rarity": "Classified",
+                "rarity_color": "d32ce6",
+                "type": "Rifle",
+                "weapon": "AK-47",
+                "exterior": "Field-Tested"
+            },
+            {
+                "name": "AWP | Dragon Lore",
+                "icon": "https://steamcommunity-a.akamaihd.net/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvCo04DEVlxkKgpot621FAR17P7NdTRH-t26q4SClPX7PYTdn2xZ_It03ujAo9-k0VfsrRY_Yj-iLI-TIwBqNQ2Fqwe3wefxxcjr8xQDJoX",
+                "rarity": "Covert",
+                "rarity_color": "eb4b4b",
+                "type": "Rifle",
+                "weapon": "AWP",
+                "exterior": "Factory New"
+            },
+            {
+                "name": "★ Karambit | Fade",
+                "icon": "https://steamcommunity-a.akamaihd.net/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvCo04DEVlxkKgpovbSsLQJf3qr3czxb49KzgL-KmsjwPYTFk2pH68Fy0u2SptSj2ADh8xI5Y26iJI-TIwI5Zw3Q8gDrwOnxxcjrlUvvEG8",
+                "rarity": "Extraordinary",
+                "rarity_color": "e4ae39",
+                "type": "Knife",
+                "weapon": "Karambit",
+                "exterior": "Factory New"
+            },
+            {
+                "name": "M4A4 | Howl",
+                "icon": "https://steamcommunity-a.akamaihd.net/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvCo04DEVlxkKgpou-6kejhz2v_Nfz5H_uO1gb-Gw_alDL_Dj3lU6sJ-jOvC8NikjACg-BI_Mm36JtTHcwJrYguGqAe6yLjtgJe87s7Ln3Zq7nEl7C2PyRKwhgYMMLK9tOveFwsZO9XjfA",
+                "rarity": "Covert",
+                "rarity_color": "eb4b4b",
+                "type": "Rifle",
+                "weapon": "M4A4",
+                "exterior": "Minimal Wear"
+            },
+            {
+                "name": "Glock-18 | Fade",
+                "icon": "https://steamcommunity-a.akamaihd.net/economy/image/-9a81dlWLwJ2UUGcVs_nsVtzdOEdtWwKGZZLQHTxDZ7I56KU0Zwwo4NUX4oFJZEHLbXH5ApeO4YmlhxYQknCRvCo04DEVlxkKgposbaqKAxf0Ob3djFN79eJkoyKjfLLMbTQmGpD6dd2j6eQ89653ATm-kI-MGjxctOXdQE6M13VqVi9k-a50JG-7ZnKm3th7HFx5X_D30vgqOO8w60",
+                "rarity": "Restricted",
+                "rarity_color": "8847ff",
+                "type": "Pistol",
+                "weapon": "Glock-18",
+                "exterior": "Factory New"
+            }
+        ];
+
+        // Enhanced Particle System
+        class ParticleSystem {
+            constructor(canvas) {
+                this.canvas = canvas;
+                this.ctx = canvas.getContext('2d');
+                this.particles = [];
+                this.resize();
+                this.createParticles();
+                this.animate();
+                
+                window.addEventListener('resize', () => this.resize());
+            }
+
+            resize() {
+                this.canvas.width = window.innerWidth;
+                this.canvas.height = window.innerHeight;
+            }
+
+            createParticles() {
+                const particleCount = 80;
+                this.particles = [];
+                
+                for (let i = 0; i < particleCount; i++) {
+                    this.particles.push({
+                        x: Math.random() * this.canvas.width,
+                        y: Math.random() * this.canvas.height,
+                        size: Math.random() * 4 + 1,
+                        speedX: (Math.random() - 0.5) * 2,
+                        speedY: (Math.random() - 0.5) * 2,
+                        opacity: Math.random() * 0.8 + 0.2,
+                        color: Math.random() > 0.3 ? '#FFD700' : '#C9A84C',
+                        glowIntensity: Math.random() * 0.5 + 0.5
+                    });
+                }
+            }
+
+            animate() {
+                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+                
+                this.particles.forEach(particle => {
+                    // Update position
+                    particle.x += particle.speedX;
+                    particle.y += particle.speedY;
+                    
+                    // Wrap around screen
+                    if (particle.x > this.canvas.width) particle.x = 0;
+                    if (particle.x < 0) particle.x = this.canvas.width;
+                    if (particle.y > this.canvas.height) particle.y = 0;
+                    if (particle.y < 0) particle.y = this.canvas.height;
+                    
+                    // Draw particle with glow
+                    this.ctx.beginPath();
+                    this.ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
+                    this.ctx.fillStyle = particle.color;
+                    this.ctx.globalAlpha = particle.opacity;
+                    this.ctx.shadowColor = particle.color;
+                    this.ctx.shadowBlur = particle.size * particle.glowIntensity * 3;
+                    this.ctx.fill();
+                    
+                    // Reset shadow
+                    this.ctx.shadowBlur = 0;
+                    
+                    // Add occasional sparkle effect
+                    if (Math.random() > 0.995) {
+                        this.ctx.beginPath();
+                        this.ctx.arc(particle.x, particle.y, particle.size * 3, 0, Math.PI * 2);
+                        this.ctx.strokeStyle = particle.color;
+                        this.ctx.globalAlpha = 0.5;
+                        this.ctx.stroke();
+                    }
+                });
+                
+                this.ctx.globalAlpha = 1;
+                requestAnimationFrame(() => this.animate());
+            }
+        }
+
+        // Initialize particle system
+        const particleCanvas = document.getElementById('particleCanvas');
+        new ParticleSystem(particleCanvas);
+
+        // Scroll progress bar
+        function updateScrollProgress() {
+            const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrolled = (winScroll / height) * 100;
+            document.querySelector('.scroll-progress').style.width = scrolled + '%';
+        }
+
+        window.addEventListener('scroll', updateScrollProgress);
+
+        // Enhanced 3D Card Tilt Effect Following Cursor
+        function setup3DCardTilt() {
+            const cards = document.querySelectorAll('.item-card');
+            
+            cards.forEach(card => {
+                card.addEventListener('mouseenter', () => {
+                    card.classList.add('tilt-active');
+                });
+                
+                card.addEventListener('mousemove', (e) => {
+                    if (!card.classList.contains('tilt-active')) return;
+                    
+                    const rect = card.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
+                    
+                    const centerX = rect.width / 2;
+                    const centerY = rect.height / 2;
+                    
+                    const rotateX = (y - centerY) / centerY * -15;
+                    const rotateY = (x - centerX) / centerX * 15;
+                    
+                    card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-12px) scale(1.03)`;
+                });
+                
+                card.addEventListener('mouseleave', () => {
+                    card.classList.remove('tilt-active');
+                    card.style.transform = '';
+                });
+            });
+        }
+
+        // Load inventory data with fallback
+        async function loadInventory() {
+            try {
+                const response = await fetch('./inventory_data.json');
+                if (response.ok) {
+                    inventoryData = await response.json();
+                } else {
+                    throw new Error('Failed to fetch inventory data');
+                }
+            } catch (error) {
+                console.warn('Using fallback inventory data:', error);
+                inventoryData = fallbackData;
+            }
+            
+            filteredData = [...inventoryData];
+            renderInventory();
+            generateCharts();
+            animateCounters();
+            
+            // Hide loading state
+            document.getElementById('loadingState').style.display = 'none';
+            document.getElementById('inventoryGrid').style.display = 'grid';
+        }
+
+        // Enhanced Render inventory grid with cinematic effects
+        function renderInventory() {
+            const grid = document.getElementById('inventoryGrid');
+            const noResults = document.getElementById('noResults');
+            
+            if (filteredData.length === 0) {
+                grid.style.display = 'none';
+                noResults.classList.remove('hidden');
+                return;
+            }
+            
+            grid.style.display = 'grid';
+            noResults.classList.add('hidden');
+            
+            grid.innerHTML = filteredData.map((item, index) => {
+                const rarityColor = `#${item.rarity_color}`;
+                const isStatTrak = item.name.includes('StatTrak™');
+                const isSouvenir = item.name.includes('Souvenir');
+                const isKnife = item.name.includes('★');
+                
+                return `
+                    <div class="item-card glass-card p-5 rounded-xl" 
+                         style="--rarity-color: ${rarityColor}; animation-delay: ${index * 0.05}s"
+                         onclick="openItemModal(${index})">
+                        <div class="aspect-square mb-4 rounded-lg overflow-hidden bg-black/30 flex items-center justify-center relative">
+                            <img src="${item.icon}" alt="${item.name}" 
+                                 class="max-w-full max-h-full object-contain"
+                                 loading="lazy">
+                        </div>
+                        
+                        <div class="space-y-3">
+                            ${isKnife ? '<div class="text-xs font-bold gold-gradient mb-1">★ KNIFE ★</div>' : ''}
+                            ${isStatTrak ? '<div class="text-xs font-bold text-orange-400 mb-1">StatTrak™</div>' : ''}
+                            ${isSouvenir ? '<div class="text-xs font-bold text-yellow-400 mb-1">Souvenir</div>' : ''}
+                            
+                            <h3 class="font-semibold text-sm line-clamp-2 leading-tight" style="color: ${rarityColor}">
+                                ${item.name}
+                            </h3>
+                            
+                            <div class="flex justify-between items-center text-xs">
+                                <span class="px-3 py-1 rounded-lg text-xs font-medium" 
+                                      style="background: ${rarityColor}20; color: ${rarityColor}; border: 1px solid ${rarityColor}40">
+                                    ${item.rarity}
+                                </span>
+                                ${item.exterior ? `<span class="text-text-secondary">${item.exterior}</span>` : ''}
+                            </div>
+                            
+                            <div class="flex justify-between items-center text-xs text-text-secondary">
+                                <span>${item.type}</span>
+                                ${item.weapon ? `<span>${item.weapon}</span>` : ''}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            // Re-setup card tilt and intersection observer
+            setTimeout(() => {
+                setup3DCardTilt();
+                observeElements();
+            }, 100);
+        }
+
+        // Enhanced Modal functionality
+        function openItemModal(index) {
+            const item = filteredData[index];
+            const modal = document.getElementById('itemModal');
+            const rarityColor = `#${item.rarity_color}`;
+            
+            document.getElementById('modalTitle').textContent = item.name;
+            document.getElementById('modalImage').src = item.icon;
+            
+            // Set rarity color for ambient glow
+            document.documentElement.style.setProperty('--modal-rarity-color', rarityColor);
+            
+            const details = `
+                <div class="flex justify-between items-center p-4 rounded-lg bg-black/20">
+                    <span class="px-4 py-2 rounded-lg font-medium text-lg" style="background: ${rarityColor}20; color: ${rarityColor}; border: 1px solid ${rarityColor}40">
+                        ${item.rarity}
+                    </span>
+                    ${item.exterior ? `<span class="text-text-secondary text-lg">${item.exterior}</span>` : ''}
+                </div>
+                <div class="flex justify-between items-center text-lg">
+                    <span class="gold-gradient font-medium">${item.type}</span>
+                    ${item.weapon ? `<span class="text-text-secondary">${item.weapon}</span>` : ''}
+                </div>
+            `;
+            
+            document.getElementById('modalDetails').innerHTML = details;
+            modal.classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('itemModal').classList.remove('active');
+        }
+
+        document.getElementById('closeModal').addEventListener('click', closeModal);
+        document.getElementById('itemModal').addEventListener('click', (e) => {
+            if (e.target.id === 'itemModal') closeModal();
+        });
+
+        // Enhanced filter functionality
+        function setupFilters() {
+            const typeFilters = document.querySelectorAll('[data-filter]');
+            const rarityFilters = document.querySelectorAll('[data-rarity]');
+            const searchInput = document.getElementById('searchInput');
+
+            let currentType = 'all';
+            let currentRarity = 'all';
+            let searchTerm = '';
+
+            function applyFilters() {
+                filteredData = inventoryData.filter(item => {
+                    const matchesType = currentType === 'all' || item.type === currentType;
+                    const matchesRarity = currentRarity === 'all' || item.rarity === currentRarity;
+                    const matchesSearch = searchTerm === '' || 
+                        item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                        (item.weapon && item.weapon.toLowerCase().includes(searchTerm.toLowerCase()));
+                    
+                    return matchesType && matchesRarity && matchesSearch;
+                });
+                
+                renderInventory();
+            }
+
+            typeFilters.forEach(filter => {
+                filter.addEventListener('click', (e) => {
+                    typeFilters.forEach(f => f.classList.remove('active'));
+                    e.target.classList.add('active');
+                    currentType = e.target.dataset.filter;
+                    applyFilters();
+                });
+            });
+
+            rarityFilters.forEach(filter => {
+                filter.addEventListener('click', (e) => {
+                    rarityFilters.forEach(f => f.classList.remove('active'));
+                    e.target.classList.add('active');
+                    currentRarity = e.target.dataset.rarity;
+                    applyFilters();
+                });
+            });
+
+            searchInput.addEventListener('input', (e) => {
+                searchTerm = e.target.value;
+                applyFilters();
+            });
+        }
+
+        // Generate charts (same as v3 but enhanced styling)
+        function generateCharts() {
+            generateRarityChart();
+            generateTypeChart();
+        }
+
+        function generateRarityChart() {
+            const rarities = {};
+            const rarityColors = {
+                'Consumer Grade': '#b0c3d9',
+                'Industrial Grade': '#5e98d9',
+                'Mil-Spec Grade': '#4b69ff',
+                'Restricted': '#8847ff',
+                'Classified': '#d32ce6',
+                'Covert': '#eb4b4b',
+                'Extraordinary': '#e4ae39',
+                'Base Grade': '#b0c3d9',
+                'High Grade': '#4b69ff',
+                'Remarkable': '#8847ff',
+                'Exotic': '#d32ce6',
+                'Master': '#eb4b4b',
+                'Superior': '#d32ce6',
+                'Exceptional': '#8847ff'
+            };
+
+            inventoryData.forEach(item => {
+                rarities[item.rarity] = (rarities[item.rarity] || 0) + 1;
+            });
+
+            const maxCount = Math.max(...Object.values(rarities));
+            const chartHtml = Object.entries(rarities)
+                .sort((a, b) => b[1] - a[1])
+                .map(([rarity, count]) => {
+                    const percentage = (count / maxCount) * 100;
+                    const color = rarityColors[rarity] || '#ffffff';
+                    
+                    return `
+                        <div class="flex items-center space-x-4">
+                            <div class="w-24 text-sm font-medium" style="color: ${color}">${rarity}</div>
+                            <div class="flex-1 h-10 bg-white/5 rounded-lg overflow-hidden">
+                                <div class="chart-bar h-full transition-all duration-1000" 
+                                     style="width: ${percentage}%; background: linear-gradient(90deg, ${color}80, ${color}); box-shadow: 0 0 10px ${color}40;">
+                                </div>
+                            </div>
+                            <div class="w-8 text-sm text-right font-semibold gold-gradient">${count}</div>
+                        </div>
+                    `;
+                }).join('');
+
+            document.getElementById('rarityChart').innerHTML = chartHtml;
+        }
+
+        function generateTypeChart() {
+            const types = {};
+            
+            inventoryData.forEach(item => {
+                types[item.type] = (types[item.type] || 0) + 1;
+            });
+
+            const maxCount = Math.max(...Object.values(types));
+            const goldColors = ['#FFD700', '#C9A84C', '#B8860B', '#DAA520', '#F4A460', '#CD853F', '#D4AF37'];
+            
+            const chartHtml = Object.entries(types)
+                .sort((a, b) => b[1] - a[1])
+                .map(([type, count], index) => {
+                    const percentage = (count / maxCount) * 100;
+                    const color = goldColors[index % goldColors.length];
+                    
+                    return `
+                        <div class="flex items-center space-x-4">
+                            <div class="w-24 text-sm font-medium gold-gradient">${type}</div>
+                            <div class="flex-1 h-10 bg-white/5 rounded-lg overflow-hidden">
+                                <div class="chart-bar h-full transition-all duration-1000" 
+                                     style="width: ${percentage}%; background: linear-gradient(90deg, ${color}80, ${color}); box-shadow: 0 0 10px ${color}40;">
+                                </div>
+                            </div>
+                            <div class="w-8 text-sm text-right font-semibold gold-gradient">${count}</div>
+                        </div>
+                    `;
+                }).join('');
+
+            document.getElementById('typeChart').innerHTML = chartHtml;
+        }
+
+        // Enhanced counter animation
+        function animateCounters() {
+            const counters = document.querySelectorAll('.counter');
+            
+            counters.forEach((counter, index) => {
+                const target = parseInt(counter.dataset.target);
+                const duration = 3000;
+                const delay = index * 300;
+                
+                setTimeout(() => {
+                    const step = target / (duration / 16);
+                    let current = 0;
+                    
+                    const timer = setInterval(() => {
+                        current += step;
+                        if (current >= target) {
+                            current = target;
+                            clearInterval(timer);
+                        }
+                        counter.textContent = Math.floor(current).toLocaleString();
+                    }, 16);
+                }, delay);
+            });
+        }
+
+        // Enhanced intersection observer
+        function observeElements() {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach((entry, index) => {
+                    if (entry.isIntersecting) {
+                        setTimeout(() => {
+                            entry.target.classList.add('visible');
+                        }, index * 60); // Stagger the animations
+                    }
+                });
+            }, {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            });
+
+            document.querySelectorAll('.fade-in-up, .slide-in-left, .slide-in-right, .item-card').forEach(el => {
+                observer.observe(el);
+            });
+        }
+
+        // Smooth scrolling
+        function setupSmoothScrolling() {
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) {
+                        target.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
+                });
+            });
+        }
+
+        // Initialize everything
+        document.addEventListener('DOMContentLoaded', () => {
+            loadInventory();
+            setupFilters();
+            observeElements();
+            setupSmoothScrolling();
+            updateScrollProgress();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SHROUB | CS2 Collection Showcase</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            /* CS2 Rarity Colors */
+            --consumer: #b0c3d9;
+            --industrial: #5e98d9;
+            --mil-spec: #4b69ff;
+            --restricted: #8847ff;
+            --classified: #d32ce6;
+            --covert: #eb4b4b;
+            --extraordinary: #e4ae39;
+            --knife: #e4ae39;
+            
+            /* Theme Colors */
+            --bg-primary: #0a0a0a;
+            --bg-secondary: #111111;
+            --bg-card: rgba(17, 17, 17, 0.8);
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0a0;
+            --accent: #e4ae39;
+            --accent-secondary: #eb4b4b;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            overflow-x: hidden;
+        }
+
+        .orbitron {
+            font-family: 'Orbitron', monospace;
+        }
+
+        /* Background Gradient */
+        .bg-gradient-main {
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a0f0f 25%, #0f0a1a 50%, #0a0a0a 100%);
+        }
+
+        /* Glass Morphism */
+        .glass {
+            background: rgba(17, 17, 17, 0.3);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .glass-card {
+            background: rgba(17, 17, 17, 0.6);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .glass-card:hover {
+            background: rgba(17, 17, 17, 0.8);
+            border-color: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+
+        /* Animated Counter */
+        .counter {
+            font-variant-numeric: tabular-nums;
+        }
+
+        /* Item Card Animations */
+        .item-card {
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .item-card:hover {
+            transform: translateY(-8px) scale(1.02);
+        }
+
+        .item-card img {
+            transition: transform 0.3s ease;
+        }
+
+        .item-card:hover img {
+            transform: scale(1.1);
+        }
+
+        /* Rarity Glow Effects */
+        .rarity-glow {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .rarity-glow::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            padding: 2px;
+            background: linear-gradient(45deg, transparent, var(--rarity-color, #fff), transparent);
+            border-radius: inherit;
+            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            mask-composite: subtract;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .rarity-glow:hover::before {
+            opacity: 0.6;
+            animation: shimmer 2s ease-in-out infinite;
+        }
+
+        @keyframes shimmer {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.8; }
+        }
+
+        /* Filter Button Styles */
+        .filter-btn {
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .filter-btn.active {
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent-secondary) 100%);
+            border-color: var(--accent);
+            color: #000;
+            font-weight: 600;
+        }
+
+        .filter-btn:hover:not(.active) {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Scroll Animations */
+        .fade-in-up {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .fade-in-up.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Chart Styles */
+        .chart-bar {
+            transition: all 0.5s ease;
+            transform-origin: bottom;
+        }
+
+        .chart-bar:hover {
+            transform: scaleY(1.1);
+        }
+
+        /* Video Player Styles */
+        .video-player {
+            background: #000;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Responsive Grid */
+        .inventory-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        @media (max-width: 640px) {
+            .inventory-grid {
+                grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+                gap: 1rem;
+            }
+        }
+
+        /* Loading Shimmer */
+        .shimmer {
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            background-size: 200% 100%;
+            animation: shimmer-loading 1.5s infinite;
+        }
+
+        @keyframes shimmer-loading {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-primary);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(to bottom, var(--accent), var(--accent-secondary));
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(to bottom, #f5c842, #f54242);
+        }
+    </style>
+</head>
+<body class="bg-gradient-main">
+    <!-- Navigation -->
+    <nav class="fixed top-0 left-0 right-0 z-50 glass border-b border-white/10">
+        <div class="container mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <div class="orbitron text-xl font-bold text-accent">SHROUB</div>
+                <div class="flex space-x-6 text-sm">
+                    <a href="#hero" class="hover:text-accent transition-colors">Home</a>
+                    <a href="#inventory" class="hover:text-accent transition-colors">Inventory</a>
+                    <a href="#highlights" class="hover:text-accent transition-colors">Highlights</a>
+                    <a href="#stats" class="hover:text-accent transition-colors">Stats</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="hero" class="min-h-screen flex items-center justify-center relative overflow-hidden">
+        <div class="absolute inset-0">
+            <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-accent/10 rounded-full blur-3xl"></div>
+            <div class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-accent-secondary/10 rounded-full blur-3xl"></div>
+        </div>
+        
+        <div class="container mx-auto px-6 text-center relative z-10">
+            <div class="fade-in-up">
+                <h1 class="orbitron text-6xl md:text-8xl font-black mb-6 bg-gradient-to-r from-accent to-accent-secondary bg-clip-text text-transparent">
+                    SHROUB
+                </h1>
+                <p class="text-xl md:text-2xl text-text-secondary mb-12 max-w-2xl mx-auto">
+                    A curated collection of premium CS2 skins, representing years of passion for the game and its artistry.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto fade-in-up">
+                <div class="glass-card p-6 rounded-xl">
+                    <div class="orbitron text-3xl font-bold text-accent counter" data-target="105">0</div>
+                    <div class="text-text-secondary text-sm mt-2">Total Items</div>
+                </div>
+                <div class="glass-card p-6 rounded-xl">
+                    <div class="orbitron text-3xl font-bold text-accent counter" data-target="12500">0</div>
+                    <div class="text-text-secondary text-sm mt-2">Est. Value ($)</div>
+                </div>
+                <div class="glass-card p-6 rounded-xl">
+                    <div class="orbitron text-3xl font-bold text-accent counter" data-target="8">0</div>
+                    <div class="text-text-secondary text-sm mt-2">Rare Items</div>
+                </div>
+                <div class="glass-card p-6 rounded-xl">
+                    <div class="orbitron text-3xl font-bold text-accent counter" data-target="3">0</div>
+                    <div class="text-text-secondary text-sm mt-2">Years Collecting</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Inventory Section -->
+    <section id="inventory" class="py-20 relative">
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-12 fade-in-up">
+                <h2 class="orbitron text-4xl md:text-5xl font-bold mb-4">The Collection</h2>
+                <p class="text-text-secondary text-lg max-w-2xl mx-auto">
+                    Each item carefully selected for its rarity, design, and significance in the Counter-Strike universe.
+                </p>
+            </div>
+
+            <!-- Filters -->
+            <div class="mb-8 fade-in-up">
+                <div class="flex flex-wrap justify-center gap-3 mb-6">
+                    <button class="filter-btn active px-4 py-2 rounded-lg text-sm" data-filter="all">All Items</button>
+                    <button class="filter-btn px-4 py-2 rounded-lg text-sm" data-filter="Rifle">Rifles</button>
+                    <button class="filter-btn px-4 py-2 rounded-lg text-sm" data-filter="Pistol">Pistols</button>
+                    <button class="filter-btn px-4 py-2 rounded-lg text-sm" data-filter="SMG">SMGs</button>
+                    <button class="filter-btn px-4 py-2 rounded-lg text-sm" data-filter="Knife">Knives</button>
+                    <button class="filter-btn px-4 py-2 rounded-lg text-sm" data-filter="Gloves">Gloves</button>
+                    <button class="filter-btn px-4 py-2 rounded-lg text-sm" data-filter="Sticker">Stickers</button>
+                    <button class="filter-btn px-4 py-2 rounded-lg text-sm" data-filter="Agent">Agents</button>
+                </div>
+
+                <div class="flex flex-wrap justify-center gap-2">
+                    <button class="filter-btn px-3 py-1 rounded-md text-xs" data-rarity="all">All Rarities</button>
+                    <button class="filter-btn px-3 py-1 rounded-md text-xs" data-rarity="Covert" style="--rarity-color: #eb4b4b;">Covert</button>
+                    <button class="filter-btn px-3 py-1 rounded-md text-xs" data-rarity="Classified" style="--rarity-color: #d32ce6;">Classified</button>
+                    <button class="filter-btn px-3 py-1 rounded-md text-xs" data-rarity="Restricted" style="--rarity-color: #8847ff;">Restricted</button>
+                    <button class="filter-btn px-3 py-1 rounded-md text-xs" data-rarity="Extraordinary" style="--rarity-color: #e4ae39;">Extraordinary</button>
+                </div>
+            </div>
+
+            <!-- Search -->
+            <div class="max-w-md mx-auto mb-8 fade-in-up">
+                <input type="text" id="searchInput" placeholder="Search items..." 
+                       class="w-full px-4 py-3 bg-black/30 border border-white/10 rounded-lg focus:border-accent focus:outline-none transition-colors">
+            </div>
+
+            <!-- Loading State -->
+            <div id="loadingState" class="inventory-grid">
+                <div class="glass-card p-4 rounded-xl shimmer h-80"></div>
+                <div class="glass-card p-4 rounded-xl shimmer h-80"></div>
+                <div class="glass-card p-4 rounded-xl shimmer h-80"></div>
+                <div class="glass-card p-4 rounded-xl shimmer h-80"></div>
+            </div>
+
+            <!-- Inventory Grid -->
+            <div id="inventoryGrid" class="inventory-grid fade-in-up" style="display: none;">
+                <!-- Items will be dynamically loaded here -->
+            </div>
+
+            <!-- No Results -->
+            <div id="noResults" class="text-center py-20 hidden">
+                <div class="text-6xl mb-4">🔍</div>
+                <h3 class="text-xl font-semibold mb-2">No items found</h3>
+                <p class="text-text-secondary">Try adjusting your filters or search terms</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Highlights Section -->
+    <section id="highlights" class="py-20 bg-black/20">
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-12 fade-in-up">
+                <h2 class="orbitron text-4xl md:text-5xl font-bold mb-4">Epic Moments</h2>
+                <p class="text-text-secondary text-lg max-w-2xl mx-auto">
+                    Watch the plays that define skill, strategy, and pure adrenaline in Counter-Strike.
+                </p>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-8 max-w-6xl mx-auto">
+                <div class="fade-in-up">
+                    <div class="video-player">
+                        <video controls class="w-full aspect-video" poster="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1920 1080'%3E%3Crect fill='%23000' width='1920' height='1080'/%3E%3Ctext x='960' y='540' text-anchor='middle' fill='%23e4ae39' font-family='monospace' font-size='48'%3E1v4 CLUTCH%3C/text%3E%3C/svg%3E">
+                            <source src="../cs2-content/1v4_clutch_short_compressed.mp4" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    </div>
+                    <div class="mt-4">
+                        <h3 class="text-xl font-semibold mb-2">Legendary 1v4 Clutch</h3>
+                        <p class="text-text-secondary text-sm">An incredible display of skill and nerves under pressure. Watch as SHROUB turns an impossible situation into victory.</p>
+                    </div>
+                </div>
+
+                <div class="fade-in-up">
+                    <div class="video-player">
+                        <video controls class="w-full aspect-video" poster="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1920 1080'%3E%3Crect fill='%23000' width='1920' height='1080'/%3E%3Ctext x='960' y='540' text-anchor='middle' fill='%23eb4b4b' font-family='monospace' font-size='48'%3EACE SPRAYDOWN%3C/text%3E%3C/svg%3E">
+                            <source src="../cs2-content/ace_spraydown.mp4" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    </div>
+                    <div class="mt-4">
+                        <h3 class="text-xl font-semibold mb-2">Perfect Ace Spraydown</h3>
+                        <p class="text-text-secondary text-sm">Flawless recoil control and positioning lead to a devastating ace. Pure mechanical skill on display.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section id="stats" class="py-20">
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-12 fade-in-up">
+                <h2 class="orbitron text-4xl md:text-5xl font-bold mb-4">Collection Analytics</h2>
+                <p class="text-text-secondary text-lg max-w-2xl mx-auto">
+                    Deep dive into the composition and value distribution of this curated arsenal.
+                </p>
+            </div>
+
+            <div class="grid lg:grid-cols-2 gap-12 max-w-6xl mx-auto">
+                <!-- Rarity Distribution -->
+                <div class="glass-card p-8 rounded-xl fade-in-up">
+                    <h3 class="text-2xl font-semibold mb-6 orbitron">Rarity Breakdown</h3>
+                    <div id="rarityChart" class="space-y-4">
+                        <!-- Chart will be generated by JS -->
+                    </div>
+                </div>
+
+                <!-- Type Distribution -->
+                <div class="glass-card p-8 rounded-xl fade-in-up">
+                    <h3 class="text-2xl font-semibold mb-6 orbitron">Item Categories</h3>
+                    <div id="typeChart" class="space-y-4">
+                        <!-- Chart will be generated by JS -->
+                    </div>
+                </div>
+
+                <!-- Collection Timeline -->
+                <div class="glass-card p-8 rounded-xl fade-in-up lg:col-span-2">
+                    <h3 class="text-2xl font-semibold mb-6 orbitron">Collection Highlights</h3>
+                    <div class="grid md:grid-cols-3 gap-6">
+                        <div class="text-center">
+                            <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-accent to-accent-secondary flex items-center justify-center">
+                                <span class="text-2xl">🔪</span>
+                            </div>
+                            <h4 class="font-semibold mb-2">Premium Knives</h4>
+                            <p class="text-text-secondary text-sm">M9 Bayonet Lore and other high-tier blades represent the pinnacle of CS2 collecting.</p>
+                        </div>
+                        <div class="text-center">
+                            <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-accent to-accent-secondary flex items-center justify-center">
+                                <span class="text-2xl">🧤</span>
+                            </div>
+                            <h4 class="font-semibold mb-2">Rare Gloves</h4>
+                            <p class="text-text-secondary text-sm">Sport Gloves Omega in Minimal Wear condition - a true collector's piece.</p>
+                        </div>
+                        <div class="text-center">
+                            <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-accent to-accent-secondary flex items-center justify-center">
+                                <span class="text-2xl">🏆</span>
+                            </div>
+                            <h4 class="font-semibold mb-2">Tournament Items</h4>
+                            <p class="text-text-secondary text-sm">Souvenir items and tournament stickers commemorate legendary CS2 moments.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-12 bg-black/50 border-t border-white/10">
+        <div class="container mx-auto px-6 text-center">
+            <div class="orbitron text-2xl font-bold text-accent mb-4">SHROUB</div>
+            <p class="text-text-secondary mb-4">Passionate CS2 collector and player</p>
+            <div class="flex justify-center space-x-6 text-sm">
+                <span>Steam: SHROUB</span>
+                <span>•</span>
+                <span>Collection Value: $12,500+</span>
+                <span>•</span>
+                <span>Items: 105</span>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        let inventoryData = [];
+        let filteredData = [];
+
+        // Load inventory data
+        async function loadInventory() {
+            try {
+                const response = await fetch('./inventory_data.json');
+                inventoryData = await response.json();
+                filteredData = [...inventoryData];
+                
+                renderInventory();
+                generateCharts();
+                animateCounters();
+                
+                // Hide loading state
+                document.getElementById('loadingState').style.display = 'none';
+                document.getElementById('inventoryGrid').style.display = 'grid';
+                
+            } catch (error) {
+                console.error('Error loading inventory:', error);
+                document.getElementById('loadingState').innerHTML = '<div class="col-span-full text-center py-20"><p class="text-red-500">Error loading inventory data</p></div>';
+            }
+        }
+
+        // Render inventory grid
+        function renderInventory() {
+            const grid = document.getElementById('inventoryGrid');
+            const noResults = document.getElementById('noResults');
+            
+            if (filteredData.length === 0) {
+                grid.style.display = 'none';
+                noResults.classList.remove('hidden');
+                return;
+            }
+            
+            grid.style.display = 'grid';
+            noResults.classList.add('hidden');
+            
+            grid.innerHTML = filteredData.map((item, index) => {
+                const rarityColor = `#${item.rarity_color}`;
+                const isStatTrak = item.name.includes('StatTrak™');
+                const isSouvenir = item.name.includes('Souvenir');
+                const isKnife = item.name.includes('★');
+                
+                return `
+                    <div class="item-card glass-card p-4 rounded-xl rarity-glow fade-in-up" 
+                         style="--rarity-color: ${rarityColor}; animation-delay: ${index * 0.1}s">
+                        <div class="aspect-square mb-4 rounded-lg overflow-hidden bg-black/30 flex items-center justify-center">
+                            <img src="${item.icon}" alt="${item.name}" 
+                                 class="max-w-full max-h-full object-contain"
+                                 loading="lazy">
+                        </div>
+                        
+                        <div class="space-y-2">
+                            ${isKnife ? '<div class="text-xs font-bold text-accent mb-1">★ KNIFE ★</div>' : ''}
+                            ${isStatTrak ? '<div class="text-xs font-bold text-orange-400 mb-1">StatTrak™</div>' : ''}
+                            ${isSouvenir ? '<div class="text-xs font-bold text-yellow-400 mb-1">Souvenir</div>' : ''}
+                            
+                            <h3 class="font-semibold text-sm line-clamp-2 leading-tight" style="color: ${rarityColor}">
+                                ${item.name}
+                            </h3>
+                            
+                            <div class="flex justify-between items-center text-xs">
+                                <span class="px-2 py-1 rounded text-xs font-medium" 
+                                      style="background: ${rarityColor}20; color: ${rarityColor}; border: 1px solid ${rarityColor}40">
+                                    ${item.rarity}
+                                </span>
+                                ${item.exterior ? `<span class="text-text-secondary">${item.exterior}</span>` : ''}
+                            </div>
+                            
+                            <div class="flex justify-between items-center text-xs text-text-secondary">
+                                <span>${item.type}</span>
+                                ${item.weapon ? `<span>${item.weapon}</span>` : ''}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            // Re-trigger intersection observer for new elements
+            observeElements();
+        }
+
+        // Filter functionality
+        function setupFilters() {
+            const typeFilters = document.querySelectorAll('[data-filter]');
+            const rarityFilters = document.querySelectorAll('[data-rarity]');
+            const searchInput = document.getElementById('searchInput');
+
+            let currentType = 'all';
+            let currentRarity = 'all';
+            let searchTerm = '';
+
+            function applyFilters() {
+                filteredData = inventoryData.filter(item => {
+                    const matchesType = currentType === 'all' || item.type === currentType;
+                    const matchesRarity = currentRarity === 'all' || item.rarity === currentRarity;
+                    const matchesSearch = searchTerm === '' || 
+                        item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                        item.weapon.toLowerCase().includes(searchTerm.toLowerCase());
+                    
+                    return matchesType && matchesRarity && matchesSearch;
+                });
+                
+                renderInventory();
+            }
+
+            typeFilters.forEach(filter => {
+                filter.addEventListener('click', (e) => {
+                    typeFilters.forEach(f => f.classList.remove('active'));
+                    e.target.classList.add('active');
+                    currentType = e.target.dataset.filter;
+                    applyFilters();
+                });
+            });
+
+            rarityFilters.forEach(filter => {
+                filter.addEventListener('click', (e) => {
+                    rarityFilters.forEach(f => f.classList.remove('active'));
+                    e.target.classList.add('active');
+                    currentRarity = e.target.dataset.rarity;
+                    applyFilters();
+                });
+            });
+
+            searchInput.addEventListener('input', (e) => {
+                searchTerm = e.target.value;
+                applyFilters();
+            });
+        }
+
+        // Generate charts
+        function generateCharts() {
+            generateRarityChart();
+            generateTypeChart();
+        }
+
+        function generateRarityChart() {
+            const rarities = {};
+            const rarityColors = {
+                'Consumer Grade': '#b0c3d9',
+                'Industrial Grade': '#5e98d9',
+                'Mil-Spec Grade': '#4b69ff',
+                'Restricted': '#8847ff',
+                'Classified': '#d32ce6',
+                'Covert': '#eb4b4b',
+                'Extraordinary': '#e4ae39',
+                'Base Grade': '#b0c3d9',
+                'High Grade': '#4b69ff',
+                'Remarkable': '#8847ff',
+                'Exotic': '#d32ce6',
+                'Master': '#eb4b4b',
+                'Superior': '#d32ce6',
+                'Exceptional': '#8847ff'
+            };
+
+            inventoryData.forEach(item => {
+                rarities[item.rarity] = (rarities[item.rarity] || 0) + 1;
+            });
+
+            const maxCount = Math.max(...Object.values(rarities));
+            const chartHtml = Object.entries(rarities)
+                .sort((a, b) => b[1] - a[1])
+                .map(([rarity, count]) => {
+                    const percentage = (count / maxCount) * 100;
+                    const color = rarityColors[rarity] || '#ffffff';
+                    
+                    return `
+                        <div class="flex items-center space-x-4">
+                            <div class="w-20 text-sm font-medium" style="color: ${color}">${rarity}</div>
+                            <div class="flex-1 h-8 bg-white/5 rounded-lg overflow-hidden">
+                                <div class="chart-bar h-full rounded-lg transition-all duration-1000" 
+                                     style="width: ${percentage}%; background: linear-gradient(90deg, ${color}80, ${color})">
+                                </div>
+                            </div>
+                            <div class="w-8 text-sm text-right">${count}</div>
+                        </div>
+                    `;
+                }).join('');
+
+            document.getElementById('rarityChart').innerHTML = chartHtml;
+        }
+
+        function generateTypeChart() {
+            const types = {};
+            
+            inventoryData.forEach(item => {
+                types[item.type] = (types[item.type] || 0) + 1;
+            });
+
+            const maxCount = Math.max(...Object.values(types));
+            const colors = ['#e4ae39', '#eb4b4b', '#d32ce6', '#8847ff', '#4b69ff', '#5e98d9', '#b0c3d9'];
+            
+            const chartHtml = Object.entries(types)
+                .sort((a, b) => b[1] - a[1])
+                .map(([type, count], index) => {
+                    const percentage = (count / maxCount) * 100;
+                    const color = colors[index % colors.length];
+                    
+                    return `
+                        <div class="flex items-center space-x-4">
+                            <div class="w-20 text-sm font-medium">${type}</div>
+                            <div class="flex-1 h-8 bg-white/5 rounded-lg overflow-hidden">
+                                <div class="chart-bar h-full rounded-lg transition-all duration-1000" 
+                                     style="width: ${percentage}%; background: linear-gradient(90deg, ${color}80, ${color})">
+                                </div>
+                            </div>
+                            <div class="w-8 text-sm text-right">${count}</div>
+                        </div>
+                    `;
+                }).join('');
+
+            document.getElementById('typeChart').innerHTML = chartHtml;
+        }
+
+        // Animate counters
+        function animateCounters() {
+            const counters = document.querySelectorAll('.counter');
+            
+            counters.forEach(counter => {
+                const target = parseInt(counter.dataset.target);
+                const duration = 2000;
+                const step = target / (duration / 16);
+                let current = 0;
+                
+                const timer = setInterval(() => {
+                    current += step;
+                    if (current >= target) {
+                        current = target;
+                        clearInterval(timer);
+                    }
+                    counter.textContent = Math.floor(current).toLocaleString();
+                }, 16);
+            });
+        }
+
+        // Intersection Observer for animations
+        function observeElements() {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                    }
+                });
+            }, {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            });
+
+            document.querySelectorAll('.fade-in-up').forEach(el => {
+                observer.observe(el);
+            });
+        }
+
+        // Smooth scrolling
+        function setupSmoothScrolling() {
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) {
+                        target.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
+                });
+            });
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            loadInventory();
+            setupFilters();
+            observeElements();
+            setupSmoothScrolling();
+        });
+    </script>
+</body>
+</html>

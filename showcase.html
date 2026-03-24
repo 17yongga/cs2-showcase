@@ -383,9 +383,11 @@
     .clip-embed {
       position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;
     }
-    .clip-embed iframe {
+    .clip-embed iframe,
+    .clip-embed video {
       position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-      border: none;
+      border: none; background: #000;
+      object-fit: cover;
     }
     .clip-label {
       padding: 0.75rem 1rem;
@@ -649,7 +651,7 @@
     <div class="highlights-featured fade-in">
       <div class="clip-card">
         <div class="clip-embed">
-          <iframe src="https://www.youtube.com/embed/Y3wuzlFehZI?rel=0&modestbranding=1" allowfullscreen loading="lazy"></iframe>
+          <video src="clips/01-1v4-clutch.mp4" controls preload="metadata" playsinline></video>
         </div>
         <div class="clip-label">
           <span class="clip-type">1v4 Clutch</span>
@@ -658,11 +660,11 @@
       </div>
       <div class="clip-card">
         <div class="clip-embed">
-          <iframe src="https://www.youtube.com/embed/9xQ7SdKmrNg?rel=0&modestbranding=1" allowfullscreen loading="lazy"></iframe>
+          <video src="clips/08-crisp-ace.mp4" controls preload="metadata" playsinline></video>
         </div>
         <div class="clip-label">
           <span class="clip-type">ACE</span>
-          <span class="clip-title">Clean ace</span>
+          <span class="clip-title">Crisp ace</span>
         </div>
       </div>
     </div>
@@ -671,7 +673,7 @@
     <div class="highlights-row fade-in">
       <div class="clip-card">
         <div class="clip-embed">
-          <iframe src="https://www.youtube.com/embed/rg6ZpRHqKds?rel=0&modestbranding=1" allowfullscreen loading="lazy"></iframe>
+          <video src="clips/03-awp-ace.mp4" controls preload="metadata" playsinline></video>
         </div>
         <div class="clip-label">
           <span class="clip-type">ACE</span>
@@ -680,7 +682,7 @@
       </div>
       <div class="clip-card">
         <div class="clip-embed">
-          <iframe src="https://www.youtube.com/embed/64Owsttu5GI?rel=0&modestbranding=1" allowfullscreen loading="lazy"></iframe>
+          <video src="clips/02-1v4-knife.mp4" controls preload="metadata" playsinline></video>
         </div>
         <div class="clip-label">
           <span class="clip-type">1v4 Clutch</span>
@@ -689,7 +691,7 @@
       </div>
       <div class="clip-card">
         <div class="clip-embed">
-          <iframe src="https://www.youtube.com/embed/4CJgRrHFD50?rel=0&modestbranding=1" allowfullscreen loading="lazy"></iframe>
+          <video src="clips/04-spray-ace.mp4" controls preload="metadata" playsinline></video>
         </div>
         <div class="clip-label">
           <span class="clip-type">ACE</span>
@@ -702,7 +704,7 @@
     <div class="highlights-row fade-in" style="border-top:none; margin-top:1px">
       <div class="clip-card">
         <div class="clip-embed">
-          <iframe src="https://www.youtube.com/embed/2z0ggQsypXs?rel=0&modestbranding=1" allowfullscreen loading="lazy"></iframe>
+          <video src="clips/05-clutch-deny-ot.mp4" controls preload="metadata" playsinline></video>
         </div>
         <div class="clip-label">
           <span class="clip-type">1v3 Clutch</span>
@@ -711,20 +713,20 @@
       </div>
       <div class="clip-card">
         <div class="clip-embed">
-          <iframe src="https://www.youtube.com/embed/U-undrB-xms?rel=0&modestbranding=1" allowfullscreen loading="lazy"></iframe>
+          <video src="clips/06-4k-push-ot.mp4" controls preload="metadata" playsinline></video>
         </div>
         <div class="clip-label">
-          <span class="clip-type">3v1</span>
-          <span class="clip-title">3v1 with crazy shots</span>
+          <span class="clip-type">4K</span>
+          <span class="clip-title">4K to push to OT</span>
         </div>
       </div>
       <div class="clip-card">
         <div class="clip-embed">
-          <iframe src="https://www.youtube.com/embed/gEDmrpvP-4o?rel=0&modestbranding=1" allowfullscreen loading="lazy"></iframe>
+          <video src="clips/07-1v3-clutch.mp4" controls preload="metadata" playsinline></video>
         </div>
         <div class="clip-label">
-          <span class="clip-type">Clutch</span>
-          <span class="clip-title">Clutch up</span>
+          <span class="clip-type">1v3 Clutch</span>
+          <span class="clip-title">1v3 clutch</span>
         </div>
       </div>
     </div>
@@ -798,79 +800,78 @@ const RARITY_COLORS = {
 };
 
 // ── Wall of Fame ─────────────────────────────────────────────────────────────
-// TODO: Gary — fill in role, remark, and hours for each friend!
 const FRIENDS = [
   {
     name: "LGx Replay",
     url: "https://steamcommunity.com/id/b2eeckerle/",
     avatar: "https://avatars.fastly.steamstatic.com/e4f47905759ff2577b49cf61fba1ab0935531043_full.jpg",
-    role: "—",
-    remark: "—",
-    hours: "—"
+    role: "AWPer",
+    remark: "The goat",
+    hours: "350 hrs · 500 matches · since 2021"
   },
   {
     name: "Bulbasaur",
     url: "https://steamcommunity.com/id/EAT_MY_DEAG/",
     avatar: "https://avatars.fastly.steamstatic.com/52f28d6dde4b35b3e4328bdddda0364412b497e3_full.jpg",
-    role: "—",
-    remark: "—",
-    hours: "—"
+    role: "Anchor",
+    remark: "Always reliable",
+    hours: "227 hrs · 341 matches"
   },
   {
     name: "Spam Musubi",
     url: "https://steamcommunity.com/profiles/76561197971536467",
     avatar: "https://avatars.fastly.steamstatic.com/d4fee50fe45c6acdb1aa5db49bae92f880bd29a9_full.jpg",
-    role: "—",
-    remark: "—",
-    hours: "—"
+    role: "Case Opener",
+    remark: "Always cracking cases",
+    hours: "200 hrs · 300 matches"
   },
   {
     name: "Thovex",
     url: "https://steamcommunity.com/id/ThovexOvex/",
     avatar: "https://avatars.fastly.steamstatic.com/8360108582ebcca56d39d73e39cd300535cd075c_full.jpg",
-    role: "—",
-    remark: "—",
-    hours: "—"
+    role: "Entry Fragger",
+    remark: "Entry god, never rages",
+    hours: "133 hrs · 200 matches"
   },
   {
     name: "RyanMehalic",
     url: "https://steamcommunity.com/profiles/76561198307989805",
     avatar: "https://avatars.fastly.steamstatic.com/1a342e4873ad3ef19d38f0bbdefabebaff13eee9_full.jpg",
-    role: "—",
-    remark: "—",
-    hours: "—"
+    role: "Rifler / AWPer",
+    remark: "Ice-veined clutch king — calm, calculated, always delivers when it matters most",
+    hours: "133 hrs · 200 matches"
   },
   {
     name: "Nelson",
     url: "https://steamcommunity.com/profiles/76561197995724592",
     avatar: "https://avatars.fastly.steamstatic.com/c12786d950f89e592635ee09bc784533b5312f2c_full.jpg",
-    role: "—",
-    remark: "—",
-    hours: "—"
+    role: "Support",
+    remark: "The heart of the squad — humble, kind, and always a good time to have around",
+    hours: "200 hrs · 300 matches"
   },
   {
     name: "Ferg",
     url: "https://steamcommunity.com/profiles/76561198027148178",
     avatar: "https://avatars.fastly.steamstatic.com/18c53abcee973133d1c03d02afd45f817c089a95_full.jpg",
-    role: "—",
-    remark: "—",
-    hours: "—"
+    role: "Fragger",
+    remark: "The team's secret weapon — hits shots nobody sees coming and clutches games out of nowhere",
+    hours: "167 hrs · 250 matches"
   },
   {
     name: "erzu",
     url: "https://steamcommunity.com/id/erzu/",
     avatar: "https://avatars.fastly.steamstatic.com/e0965134a9f685ea04a2c9ffbc73224051c9e5cd_full.jpg",
-    role: "—",
-    remark: "—",
-    hours: "—"
+    role: "All-rounder",
+    remark: "Quiet but locked in — always calm, always getting multi-kills when it counts",
+    hours: "100 hrs · 150 matches"
   },
   {
     name: "Tank",
     url: "https://steamcommunity.com/profiles/76561198121942659",
     avatar: "https://avatars.fastly.steamstatic.com/55b4aa71f06662c530d91a75b1358a3f7f745ecb_full.jpg",
-    role: "—",
-    remark: "—",
-    hours: "—"
+    role: "Rifler",
+    remark: "Headshot machine — every click is a kill, and always a pleasure to have on the team",
+    hours: "67 hrs · 100 matches"
   },
 ];
 
