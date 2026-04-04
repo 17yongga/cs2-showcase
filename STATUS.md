@@ -4,6 +4,7 @@
 ## What's Live
 - ✅ **https://gary-yong.com/cs2** — clean URL now works (CloudFront Function applied 2026-03-21)
 - ✅ **https://gary-yong.com/cs2/index.html** — direct URL also works
+- ✅ Hero section: scroll-driven canvas animation (40 WebP frames, Apple-style scroll scrub)
 - ❌ ~~api.gary-yong.com/cs2/~~ — removed (2026-03-14), nginx block deleted, EC2 files purged
 
 ## What Exists Locally
@@ -21,7 +22,7 @@
 - 👥 Wall of Fame (friends/squad)
 - 📊 Stats + career summary
 
-## Current State (2026-03-14)
+## Current State (2026-03-24)
 - 🟢 **LIVE at gary-yong.com/cs2/index.html**
 - Wall of Fame: all 9 friends complete with roles, remarks, match counts
 - Arsenal: 26 items displayed

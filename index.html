@@ -35,6 +35,7 @@
       color: var(--text);
       overflow-x: hidden;
       cursor: default;
+      overscroll-behavior-x: none;
     }
 
     /* ─── SCROLLBAR ─── */
@@ -80,6 +81,7 @@
         radial-gradient(ellipse 60% 60% at 50% 40%, rgba(255,215,0,0.04) 0%, transparent 70%),
         linear-gradient(180deg, #080808 0%, #0c0a00 50%, #080808 100%);
     }
+
     /* grid lines */
     .hero-grid {
       position: absolute; inset: 0; z-index: 0;
@@ -188,18 +190,19 @@
     }
 
     /* ─── HERO CANVAS ANIMATION ─── */
-    #hero-scroll-container { position: relative; }
-    #hero { position: sticky; top: 0; overflow: hidden; }
+    #hero-scroll-container { position: relative; overflow: clip; }
+    #hero { position: sticky; top: 0; overflow: hidden; height: 100vh; height: 100dvh; }
     #hero-canvas {
-      position: absolute; inset: 0;
-      width: 100%; height: 100%;
-      z-index: 0;
+      position: absolute; top: 0; left: 0;
+      /* width/height controlled entirely by JS — no CSS stretching */
+      z-index: 2;
+      display: block;
     }
     .hero-canvas-overlay {
       position: absolute; inset: 0;
       background: rgba(0,0,0,0.45);
       pointer-events: none;
-      z-index: 1;
+      z-index: 3;
     }
     #hero-loader {
       position: absolute; inset: 0; z-index: 20;
@@ -233,7 +236,60 @@
     .hero-grid,
     .hero-corner,
     .hero-content,
-    .hero-scroll { position: relative; z-index: 3; }
+    .hero-scroll { position: relative; z-index: 5; }
+
+    /* ─── MOBILE RESPONSIVE ─── */
+    @media (max-width: 768px) {
+      /* Nav */
+      nav { padding: 0 1.25rem; }
+      .nav-links { display: none; }
+
+      /* Hero — collapse scroll container on mobile (auto-play mode, no scroll scrub) */
+      #hero-scroll-container { height: auto !important; }
+      #hero { position: relative !important; }
+      .hero-content { gap: 1.25rem; padding: 0 1.25rem; }
+      .hero-avatar { width: 100px; height: 100px; }
+      .hero-avatar-ring { inset: -4px; }
+      .hero-avatar-ring2 { inset: -10px; }
+      .hero-name { font-size: clamp(2rem, 12vw, 3.5rem); letter-spacing: 0.06em; }
+      .hero-tagline { font-size: 0.65rem; letter-spacing: 0.1em; }
+      .hero-stats { flex-wrap: wrap; justify-content: center; }
+      .hero-stat { padding: 0.75rem 1rem; flex: 1 1 40%; min-width: 100px; }
+      .hero-stat-val { font-size: 1.1rem; }
+      .hero-stat-label { font-size: 0.55rem; }
+
+      /* Sections */
+      section { padding: 3.5rem 0; }
+      .container { padding: 0 1.25rem; }
+      .section-title { font-size: clamp(1.4rem, 6vw, 2rem); }
+
+      /* Career stats grid */
+      .stats-grid { grid-template-columns: 1fr 1fr; }
+      .stat-card { padding: 1.25rem 1rem; }
+      .stat-card-val { font-size: 1.6rem; }
+
+      /* Career bio */
+      .career-bio { padding: 1.25rem; }
+
+      /* Arsenal filter */
+      .skin-filters { gap: 0.35rem; }
+      .filter-btn { padding: 0.35rem 0.75rem; font-size: 0.6rem; }
+      .skins-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
+
+      /* Highlights — stack everything 1 column */
+      .highlights-featured { grid-template-columns: 1fr; }
+      .highlights-row { grid-template-columns: 1fr; }
+
+      /* Wall of Fame */
+      .wof-grid { grid-template-columns: 1fr; }
+      .wof-intro { font-size: 0.8rem; margin-bottom: 1.5rem; }
+    }
+
+    @media (max-width: 480px) {
+      .hero-stat { flex: 1 1 45%; }
+      .stats-grid { grid-template-columns: 1fr; }
+      .skins-grid { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); }
+    }
 
     /* ─── SECTION BASE ─── */
     section { padding: 6rem 0; position: relative; }
@@ -1036,12 +1092,23 @@ renderWoF();
   let ready = false;
   let currentFrame = 0;
 
+  const isMobile = window.matchMedia("(max-width: 768px)").matches || ("ontouchstart" in window && window.innerWidth < 1024);
+
   function resizeCanvas() {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
+    const hero = document.getElementById("hero");
+    const w = hero.offsetWidth;
+    const h = hero.offsetHeight;
+    if (w === canvas.width && h === canvas.height) return;
+    canvas.width = w;
+    canvas.height = h;
+    canvas.style.width = w + "px";
+    canvas.style.height = h + "px";
     if (ready) drawFrame(currentFrame);
   }
   window.addEventListener("resize", resizeCanvas);
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener("resize", resizeCanvas);
+  }
   resizeCanvas();
 
   function drawFrame(index) {
@@ -1054,6 +1121,30 @@ renderWoF();
     const w = img.naturalWidth * scale;
     const h = img.naturalHeight * scale;
     ctx.drawImage(img, (canvas.width - w) / 2, (canvas.height - h) / 2, w, h);
+  }
+
+  // Mobile: auto-play loop at ~12fps, then hold last frame
+  let autoPlayDone = false;
+  function startAutoPlay() {
+    const FPS = 12;
+    const interval = 1000 / FPS;
+    let last = 0;
+    function tick(ts) {
+      if (autoPlayDone) return;
+      if (ts - last >= interval) {
+        last = ts;
+        drawFrame(currentFrame);
+        if (currentFrame < FRAME_COUNT - 1) {
+          currentFrame++;
+          requestAnimationFrame(tick);
+        } else {
+          autoPlayDone = true; // hold final frame
+        }
+      } else {
+        requestAnimationFrame(tick);
+      }
+    }
+    requestAnimationFrame(tick);
   }
 
   for (let i = 1; i <= FRAME_COUNT; i++) {
@@ -1069,7 +1160,11 @@ renderWoF();
         ready = true;
         drawFrame(0);
         loader.style.opacity = "0";
-        setTimeout(() => { loader.style.display = "none"; }, 600);
+        setTimeout(() => {
+          loader.style.display = "none";
+          // On mobile: auto-play after loader fades. On desktop: wait for scroll.
+          if (isMobile) startAutoPlay();
+        }, 600);
       }
     };
     img.onerror = function () {
@@ -1083,19 +1178,22 @@ renderWoF();
     img.src = BASE_URL + "frame-" + String(i).padStart(3, "0") + ".webp";
   }
 
-  window.addEventListener("scroll", function () {
-    if (!ready) return;
-    const container = document.getElementById("hero-scroll-container");
-    const rect = container.getBoundingClientRect();
-    const scrollable = container.offsetHeight - window.innerHeight;
-    const scrolled = Math.max(0, -rect.top);
-    const progress = Math.min(1, scrolled / scrollable);
-    const frameIndex = Math.min(FRAME_COUNT - 1, Math.floor(progress * FRAME_COUNT));
-    if (frameIndex !== currentFrame) {
-      currentFrame = frameIndex;
-      drawFrame(currentFrame);
-    }
-  }, { passive: true });
+  // Desktop only: scroll-driven scrub
+  if (!isMobile) {
+    window.addEventListener("scroll", function () {
+      if (!ready) return;
+      const container = document.getElementById("hero-scroll-container");
+      const rect = container.getBoundingClientRect();
+      const scrollable = container.offsetHeight - window.innerHeight;
+      const scrolled = Math.max(0, -rect.top);
+      const progress = Math.min(1, scrolled / scrollable);
+      const frameIndex = Math.min(FRAME_COUNT - 1, Math.floor(progress * FRAME_COUNT));
+      if (frameIndex !== currentFrame) {
+        currentFrame = frameIndex;
+        drawFrame(currentFrame);
+      }
+    }, { passive: true });
+  }
 })();
 </script>
 </body>
